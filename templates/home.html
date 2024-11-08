@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Navbar</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@200&display=swap" rel="stylesheet">
+    <style>
+        .icons{
+            width: 250px;
+        }
+        p{
+            font-family: 'Roboto', sans-serif;
+            font-weight: 200;
+            opacity: 0.6;
+        }
+        h1{
+            font-family: 'Poppins', sans-serif;
+            font-weight: normal;
+        }
+        .bck-container{
+            background: linear-gradient(135deg, #111111, rgba(0, 55, 136, 0.89)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");;
+            min-height: 100vh;
+            margin: 0;
+            color: white; /* To ensure readability */
+        }
+        .block {
+            height: 100%;
+            margin: 5vw;
+            border-radius: 15px;
+
+            color: white;
+            filter: contrast(120%) brightness(120%);
+            background:
+            linear-gradient(145deg, rgb(6, 164, 169), rgba(64, 0, 255, 0.56)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 0 solid transparent;
+        }
+        .block:hover{
+            border: 1px solid;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 40px rgba(59, 130, 246, 0.2);
+        }
+        .custom-navbar {
+            filter: contrast(120%) brightness(120%);
+            background:
+            linear-gradient(145deg, rgb(6, 164, 169), rgba(64, 0, 255, 0.56)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
+            color: white;
+        }
+        .custom-navbar .nav-link {
+            color: #adb5bd;
+            margin-right: 15px;
+        }
+        .custom-navbar .nav-link:hover {
+            color: #ffffff;
+        }
+        .nav-item-icon {
+            margin-right: 10px;
+        }
+        .nav-logo {
+            width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body class="custom-background">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand text-white" href="#">
+            <img class="nav-logo" src="/static/logo/MiasLogo_white.png" alt="MiasLogoWhite"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="nav-item-icon">🏠</span>Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="nav-item-icon">📄</span>Invoices</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="nav-item-icon">📦</span>Stock</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><span class="nav-item-icon">🔑</span>Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div>
+        <div class="bck-container">
+            <div class="row">
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">mInvoices</h1>
+                        <p>Manage and track your invoices easily with mInvoices app.</p>
+                        <img class="icons" src="/static/icons/invoice.svg" alt="Invoice icon">
+                    </div>
+                </div>
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">mStock</h1>
+                        <p>Monitor and manage your inventory with mStock app.</p>
+                        <img class="icons" src="/static/icons/stock.svg" alt="Stock icon">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
