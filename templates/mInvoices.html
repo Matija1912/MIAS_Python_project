@@ -1,23 +1,31 @@
 {% extends "base.html" %}
-{% block title %} Login {% endblock %}
+{% block title %} mInvoices {% endblock %}
 
 {% block content %}
-    <div class="login_block p-4 justify-content-center">
-        <div class="square text-center">
-            <h1 class="m-3">Login</h1>
-            <form method="POST">
-                <div class="form-group">
-                    <label for="email">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+    <div>
+        <div class="bck-container">
+            <div class="row">
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">Customers</h1>
+                        <p>Manage your customers through "customers" service.</p>
+                        <img class="icons" src="/static/icons/customer.svg" alt="Invoice icon">
+                        <div class="m-4">
+                            <a href="/mInvoices/customers" class="btn btn-outline-light">Manage</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">Invoices</h1>
+                        <p>Create and manage invoices with "Invoices" service.</p>
+                        <img class="icons" src="/static/icons/invoice.svg" alt="Invoice icon">
+                        <div class="m-4">
+                            <a href="/mInvoices/invoices" class="btn btn-outline-light">Create an invoice</a>
+                        </div>
+                    </div>
                 </div>
-                <br>
-                <button type="submit" class="btn btn-outline-light">Submit</button>
-            </form>
-
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -1,10 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MIAS{% endblock %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@200&display=swap" rel="stylesheet">
+    <style>
+
+        .page_btn:hover{
+            background-color: white;
+            color: #001d51;
+        }
+        .page_btn{
+            color: white;
+            background-color: transparent;
+            border: 1px white solid;
+            border-radius: 5px;
+            height: 100%;
+            width: 50px;
+            margin-right: 10px;
+        }
+
+        .page_input{
+            color: white;
+            height: 100%;
+            background-color: transparent;
+            margin-left: 10px;
+        }
+        .pagination .page-item .page-link {
+            height: 100%;
+            background-color: rgb(0, 81, 174);
+            border: none;
+            margin: 2px;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28255, 255, 255, 1%29' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+
+        .icons{
+            width: 250px;
+        }
+        label, p{
+            font-family: 'Roboto', sans-serif;
+            font-weight: 200;
+            color: white;
+            opacity: 0.6;
+        }
+        h1{
+            font-family: 'Poppins', sans-serif;
+            font-weight: normal;
+        }
+        body{
+            background-color: #001d51;
+
+            min-height: 100vh;
+        }
+        .login_block{
+
+            height: 100%;
+            margin: auto;
+            margin-top:5vh;
+            border-radius: 15px;
+            max-width: 350px;
+
+            color: white;
+            filter: contrast(120%) brightness(120%);
+            background:
+            linear-gradient(145deg, rgb(6, 164, 169), rgba(64, 0, 255, 0.56)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 0 solid transparent;
+        }
+        .user_block{
+            height: 100%;
+            width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 40px;
+            border-radius: 15px;
+            color: white;
+            background: transparent;
+            border:1px white solid;
+        }
+        .block {
+            height: 100%;
+            margin: 5vw;
+            border-radius: 15px;
+
+            color: white;
+            filter: contrast(120%) brightness(120%);
+            background:
+            linear-gradient(145deg, rgb(6, 164, 169), rgba(64, 0, 255, 0.56)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 0 solid transparent;
+        }
+        .block:hover{
+            border: 1px solid;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2), 0 0 40px rgba(59, 130, 246, 0.2);
+        }
+        .custom-navbar {
+            filter: contrast(120%) brightness(120%);
+            background:
+            linear-gradient(145deg, rgb(6, 164, 169), rgba(64, 0, 255, 0.56)),
+            url("data:image/svg+xml,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='4.32' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+
+            color: white;
+        }
+        .custom-navbar .nav-link {
+            color: #adb5bd;
+            margin-right: 15px;
+        }
+        .custom-navbar .nav-link:hover {
+            color: #ffffff;
+        }
+        .nav-item-icon {
+            margin-right: 10px;
+        }
+        .nav-logo {
+            width: 100px;
+            height: auto;
+        }
+    </style>
 </head>
-<body>
-$END$
+<body class="custom-background">
+    <nav class="navbar navbar-expand-lg custom-navbar">
+        <a class="navbar-brand text-white" href="/">
+            <img class="nav-logo" src="/static/logo/MiasLogo_white.png" alt="MiasLogoWhite"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/"><span class="nav-item-icon">🏠</span>Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mInvoices"><span class="nav-item-icon">📄</span>mInvoices</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/mStock"><span class="nav-item-icon">📦</span>mStock</a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/logout"><span class="nav-item-icon">🔑</span>Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login"><span class="nav-item-icon">🔑</span>Login</a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </nav>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                {% if category == 'error' %}
+                    <div class="m-4 alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% elif category == 'info' %}
+                    <div class="m-4 alert alert-info alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="m-4 alert alert-success alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}
+    {% endblock %}
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

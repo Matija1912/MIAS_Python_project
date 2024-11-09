@@ -2,30 +2,68 @@
 {% block title %} mInvoices {% endblock %}
 
 {% block content %}
-    <div>
-        <div class="bck-container">
-            <div class="row">
-                <div class="block col d-flex justify-content-center">
-                    <div class="square text-center">
-                        <h1 class="m-3">Customers</h1>
-                        <p>Manage your customers through "customers" service.</p>
-                        <img class="icons" src="/static/icons/customer.svg" alt="Invoice icon">
-                        <div class="m-4">
-                            <a href="/mInvoices/customers" class="btn btn-outline-light">Manage</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="block col d-flex justify-content-center">
-                    <div class="square text-center">
-                        <h1 class="m-3">Invoices</h1>
-                        <p>Create and manage invoices with "Invoices" service.</p>
-                        <img class="icons" src="/static/icons/invoice.svg" alt="Invoice icon">
-                        <div class="m-4">
-                            <a href="/mInvoices/invoices" class="btn btn-outline-light">Create an invoice</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="container mt-5">
+        <h2 class="mb-4">Customers</h2>
+        <table class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>City</th>
+                    <th>Country</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.id }}</td>
+                        <td>{{ customer.name }}</td>
+                        <td>{{ customer.email }}</td>
+                        <td>{{ customer.address }}</td>
+                        <td>{{ customer.city }}</td>
+                        <td>{{ customer.country }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No customers found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.customers', page=1) }}" aria-label="First">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.customers', page=page-1) }}" aria-label="Previous">
+                        &laquo;
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <form action="{{ url_for('mInvoicesViews.customers') }}" method="get" class="d-inline">
+                        <input type="number" name="page" min="1" max="{{ page_count }}" value="{{ page }}" class="page_input form-control d-inline-block w-auto" style="width: 70px;">
+                        <button type="submit" class="page_btn">Go</button>
+                    </form>
+                </li>
+
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.customers', page=(page + 1)) }}" aria-label="Next">
+                        &raquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.customers', page=page_count) }}" aria-label="Last">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+            <p>Page count: {{ page_count }}</p>
+        </nav>
     </div>
 {% endblock %}
