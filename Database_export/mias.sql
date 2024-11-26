@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2024 at 09:23 PM
+-- Generation Time: Nov 26, 2024 at 10:14 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -105,7 +105,8 @@ CREATE TABLE `companies` (
 --
 
 INSERT INTO `companies` (`id`, `company_name`, `street`, `city`, `post_number`, `vat_id`) VALUES
-(1, 'Motorsport innovations and solutions d.o.o.', 'Glavna cesta 84', 'Đurđekovec', '10362', 'HR92531046076');
+(1, 'Motorsport innovations and solutions d.o.o.', 'Glavna cesta 84', 'Đurđekovec', '10362', 'HR92531046076'),
+(2, 'MOTORSPORT INNOVATIONS AND SOLUTIONS d.o.o.', 'Glavna cesta 84', 'Durdekovec', '10362', 'HR92531046076');
 
 -- --------------------------------------------------------
 
@@ -206,7 +207,8 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`id`, `name`, `description`, `price_no_vat`, `vat_percentage`, `stock`, `company_id`) VALUES
 (5, 'Kayo TS90', 'Kayo TS90 pit bike.\r\nVIN:', 1000.00, 25.00, 0, 1),
 (7, 'KAYO TT140', 'Kayo TT140 pit bike.\r\nVIN: ', 1200.00, 25.00, 0, 1),
-(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 0, 1);
+(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 0, 1),
+(12, 'Product1', 'Product1 description', 1195.95, 25.00, 0, 2);
 
 -- --------------------------------------------------------
 
@@ -229,9 +231,12 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password_hash`, `first_name`, `last_name`, `company_id`, `role`) VALUES
-(1, 'matija@kayomotorcycles.eu', 'pbkdf2:sha256:1000000$olBwmlC8CeX3AvMk$dd167c1c27c0c1a2d2a8b0c1f1d41b44f756c936b90876eb403915975a7d87ed', 'Matija', 'Kovacic', 1, 'admin'),
+(1, 'matija@kayomotorcycles.eu', 'pbkdf2:sha256:1000000$olBwmlC8CeX3AvMk$dd167c1c27c0c1a2d2a8b0c1f1d41b44f756c936b90876eb403915975a7d87ed', 'Matija', 'Kovacic', 2, 'admin'),
 (3, 'marko@kayomotorcycles.eu', 'pbkdf2:sha256:1000000$V0b17bqLz401Xk7h$b5f1fee3091bda9b93d3b86c5a5e4159def2c28dd727b1064edd2b93cacd85b4', 'Marko', 'Šimunec', 1, 'admin'),
-(4, 'karlo@kayomotorcycles.eu', 'pbkdf2:sha256:1000000$RqyhWGWd7MCfvDqQ$210472a061f6952e48b3e4c40b2b5f37a504ef0584c2e46d1b77de81824fde3d', 'Karlo', 'Kovacic', 1, 'admin');
+(4, 'karlo@kayomotorcycles.eu', 'pbkdf2:sha256:1000000$RqyhWGWd7MCfvDqQ$210472a061f6952e48b3e4c40b2b5f37a504ef0584c2e46d1b77de81824fde3d', 'Karlo', 'Kovacic', 1, 'admin'),
+(5, 'domagoj@mias.eu', 'pbkdf2:sha256:1000000$RerZ2Mc6KqczDkcV$bfb6986d9d260f9714abb87d75a4fddff6c3e59a1478d0738aff6f76ff52578a', 'Domagoj', 'Lepen', 2, 'admin'),
+(6, 'roman@mias.eu', 'pbkdf2:sha256:1000000$YMurxZfR4niAPXUz$806eb1d7b527f3ec8232fd89b49860f2bcca7601d417fdb7e0a477b62a9eb7c3', 'Roman', 'Kuzman', 2, 'admin'),
+(7, 'stjepan@mias.eu', 'pbkdf2:sha256:1000000$0HKt2EXmTliBDLa5$9d5ebd14e123c9b35be0e73cfa9ee0a6dc31ecf48ebc8b1bd00f4f7ab24b9b4c', 'Stjepan', 'Derdic', 2, 'admin');
 
 --
 -- Indexes for dumped tables
@@ -289,7 +294,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `companies`
 --
 ALTER TABLE `companies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -307,13 +312,13 @@ ALTER TABLE `invoices`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
