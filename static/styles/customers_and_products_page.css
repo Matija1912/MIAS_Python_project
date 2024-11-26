@@ -1,0 +1,42 @@
+.add_new_customer_product_div{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.title_container{
+    margin-top: 10px;
+    color: white;
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+.title_icon{
+    height: 100%;
+}
+
+.page_navigation{
+    margin-top: 10px;
+}
+
+.pagination{
+    height: 40px;
+    padding: 0;
+}
+
+.pagination > li > form > input{
+    margin: 1px;
+}
+
+.pagination > li > form > button{
+    margin: 1px;
+}
+
+.edit-delete{
+    display: flex;
+}
+
+.edit-delete button{
+    margin-right: 10px;
+}
+

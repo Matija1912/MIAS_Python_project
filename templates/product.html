@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %} Product {% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/newProduct.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="new_product_table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
+            <h2>Edit product info</h2>
+        </div>
+
+         <form method="post" class="product-form">
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" name="product-name" value="{{ product.name }}" required>
+
+            <label for="product-description">Description</label>
+            <textarea id="product-description" name="product-description" rows="4">{{ product.description }}</textarea>
+
+            <div class="price-and-vat">
+                <div>
+                    <label for="product-price">Price(VAT excluded)</label>
+                    <input type="number" step="0.01" id="product-price" name="product-price" value="{{ product.price_no_vat }}" required>
+                </div>
+
+                <div>
+                    <label for="product-vat">VAT</label>
+                    <select id="product-vat" name="product-vat">
+                        {% if product.vat_percentage == 25 %}
+                            <option value="0">None</option>
+                            <option value="25" selected>25%</option>
+                        {% else %}
+                             <option value="0" selected>None</option>
+                            <option value="25">25%</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-outline-light">Update</button>
+                <a href="../products" class="btn btn-outline-light">Back</a>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

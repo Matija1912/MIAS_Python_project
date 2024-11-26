@@ -1,29 +1,51 @@
 {% extends "base.html" %}
 {% block title %} mInvoices {% endblock %}
 
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tables.css') }}">
+{% endblock %}
+
 {% block content %}
-    <div class="container mt-5">
-        <h2 class="mb-4">Customers</h2>
-        <table class="table table-bordered table-hover">
-            <thead class="thead-dark">
+    <div class="table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
+            <h2>Customers</h2>
+        </div>
+        <div class="add_new_customer_product_div">
+            <a href="/mInvoices/customers/newCustomer" class="btn btn-outline-light">Add new customer</a>
+            <a href="../mInvoices" class="btn btn-outline-light">Back</a>
+        </div>
+        <table class="customers_product_table">
+            <thead class="customers_product_columns">
                 <tr>
-                    <th>ID</th>
                     <th>Name</th>
                     <th>Email</th>
                     <th>Address</th>
                     <th>City</th>
                     <th>Country</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="customer_product_data_columns">
                 {% for customer in customers %}
-                    <tr>
-                        <td>{{ customer.id }}</td>
+                    <tr class="customer-product-instance">
                         <td>{{ customer.name }}</td>
                         <td>{{ customer.email }}</td>
-                        <td>{{ customer.address }}</td>
+                        <td>{{ customer.street }}</td>
                         <td>{{ customer.city }}</td>
                         <td>{{ customer.country }}</td>
+                        <td>
+                            <form class="edit-delete" method="post" onsubmit="return confirm('Are you sure you wish to delete?');">
+                                <button type="button" class="btn btn-light" onclick="window.location='/mInvoices/customers/customer?id={{ customer.id }}';">
+                                    <img src="../static/icons/pen.svg">
+                                </button>
+                                <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                                <button type="submit" class="btn btn-light">
+                                    <img src="../static/icons/trash.svg">
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                 {% else %}
                     <tr>
@@ -32,7 +54,7 @@
                 {% endfor %}
             </tbody>
         </table>
-        <nav aria-label="Page navigation">
+        <nav class="page_navigation" aria-label="Page navigation">
             <ul class="pagination">
                 <li class="page-item {% if page <= 1 %}disabled{% endif %}">
                     <a class="page-link" href="{{ url_for('mInvoicesViews.customers', page=1) }}" aria-label="First">
@@ -47,7 +69,7 @@
 
                 <li class="page-item">
                     <form action="{{ url_for('mInvoicesViews.customers') }}" method="get" class="d-inline">
-                        <input type="number" name="page" min="1" max="{{ page_count }}" value="{{ page }}" class="page_input form-control d-inline-block w-auto" style="width: 70px;">
+                        <input type="number" name="page" min="1" max="{{ page_count }}" value="{{ page }}" class="page_input form-control d-inline-block w-auto">
                         <button type="submit" class="page_btn">Go</button>
                     </form>
                 </li>

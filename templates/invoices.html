@@ -1,8 +1,93 @@
 {% extends "base.html" %}
-{% block title %} mInvoices {% endblock %}
+{% block title %} Invoices {% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tables.css') }}">
+{% endblock %}
 
 {% block content %}
-    <h1>
-    Invoice management
-    </h1>
+
+    <div class="table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
+            <h2>Invoices</h2>
+        </div>
+        <div class="add_new_customer_product_div">
+            <a href="/mInvoices/invoices/newInvoice" class="btn btn-outline-light">New invoice</a>
+            <a href="../mInvoices" class="btn btn-outline-light">Back</a>
+        </div>
+        <table class="customers_product_table">
+            <thead class="customers_product_columns">
+                <tr>
+                    <th>Reference</th>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th>Amount with vat(without vat)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="customer_product_data_columns">
+                {% for invoice in invoices %}
+                    <tr class="customer-product-instance">
+                        <td>{{ "%02d" | format(invoice.invoice_number) }}/{{ "%02d" | format(invoice.invoice_device_number) }}/{{ "%02d" | format(invoice.invoice_office_number) }}</td>
+                        <td>{{ invoice.formatted_date }}</td>
+                        <td>{{ invoice.customer_name }}</td>
+                        <td>{{ invoice.status }}</td>
+                        <td>{{ invoice.amount_total_with_vat }}({{ invoice.amount_total_no_vat }})</td>
+                        <td>
+                            <form class="edit-delete" method="post" onsubmit="return confirm('Are you sure you wish to delete?');">
+                                <button type="button" class="btn btn-light" onclick="window.location='/mInvoices/customers/invoice?id={{ invoice.id }}';">
+                                    <img src="../static/icons/pen.svg">
+                                </button>
+                                <input type="hidden" name="invoice_id" value="{{ invoice.id }}">
+                                <button type="submit" class="btn btn-light">
+                                    <img src="../static/icons/trash.svg">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">No invoice found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav class="page_navigation" aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.invoices', page=1) }}" aria-label="First">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.invoices', page=page-1) }}" aria-label="Previous">
+                        &laquo;
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <form action="{{ url_for('mInvoicesViews.invoices') }}" method="get" class="d-inline">
+                        <input type="number" name="page" min="1" max="{{ page_count }}" value="{{ page }}" class="page_input form-control d-inline-block w-auto">
+                        <button type="submit" class="page_btn">Go</button>
+                    </form>
+                </li>
+
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.invoices', page=(page + 1)) }}" aria-label="Next">
+                        &raquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.invoices', page=page_count) }}" aria-label="Last">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+            <p>Page count: {{ page_count }}</p>
+        </nav>
+    </div>
+
 {% endblock %}

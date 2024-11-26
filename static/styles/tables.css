@@ -1,0 +1,40 @@
+.table_container{
+    margin-left: auto;
+    margin-right: auto;
+    width: 50vw;
+}
+
+.customers_product_table{
+    margin-right: auto;
+    margin-left: auto;
+    border-collapse: separate;
+    border-spacing: 2px;
+    border: 1px solid #2145a6;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.customers_product_columns{
+    color: white;
+}
+
+.customers_product_columns > tr > th{
+    background-color: rgb(0, 81, 174);
+    margin-right: 20px;
+    padding: 5px;
+}
+
+.customer_product_data_columns > tr > td{
+    color: white;
+    background-color: #0f2f7c;
+    padding: 5px;
+    border: 1px solid #2145a6;
+}
+
+.customer-product-instance{
+    cursor: pointer;
+}
+
+.customer_product_data_columns > tr:hover >td{
+    background-color: #2145a6;
+}

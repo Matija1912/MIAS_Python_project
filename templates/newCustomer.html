@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block custom_css %}
+     <link rel="stylesheet" href="{{ url_for('static', filename='styles/newCustomer.css') }}">
+{% endblock %}
+
+{% block title %} New customer {% endblock %}
+{% block content %}
+    <div class="new_customer_table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
+            <h2>New customer</h2>
+        </div>
+
+        <form method="post" class="customer-form">
+            <label for="customer-name">Name</label>
+            <input type="text" id="customer-name" name="customer-name" required>
+
+            <label for="customer-email">Email</label>
+            <input type="email" id="customer-email" name="customer-email">
+
+            <label for="customer-address">Address</label>
+            <input type="text" id="customer-address" name="customer-address">
+
+            <label for="customer-postal-code">Postal code</label>
+            <input type="text" id="customer-postal-code" name="customer-postal-code">
+
+            <label for="customer-city">City</label>
+            <input type="text" id="customer-city" name="customer-city">
+
+            <label for="customer-country">Country</label>
+            <input type="text" id="customer-country" name="customer-country">
+
+            <label for="customer-id">ID</label>
+            <input type="text" id="customer-id" name="customer-id">
+
+            <div>
+                <button type="submit" class="btn btn-outline-light">Add Customer</button>
+                <a href="../customers" class="btn btn-outline-light">Back</a>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

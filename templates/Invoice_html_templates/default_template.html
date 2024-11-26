@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body, html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+        .content{
+             flex: 1;
+        }
+        .header, .footer {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 100px;
+        }
+        .invoice-title {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .details {
+            margin-bottom: 20px;
+        }
+        .details-table, .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .details-table td, .items-table th, .items-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #000;
+            color: #fff;
+        }
+        .notes {
+            margin-top: 20px;
+        }
+        .footer {
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content">
+            <div class="header">
+                <h1>{{ user.company.name }}</h1>
+                <p>{{ user.company.street }}, {{ user.company.post_number }} {{ user.company.city }}, Hrvatska<br>OIB: {{ user.company.vat_id }}<br>Email: {{ user.email }}</p>
+            </div>
+
+            <div class="invoice-title">
+                <h2>Račun br. 2/01/01</h2>
+            </div>
+
+            <div class="details">
+                <table class="details-table">
+                    <tr>
+                        <td>
+                            <strong>Customer:</strong><br>
+                            MARIO - obrt za prijevoz i usluge<br>
+                            ALEJA MIRA 3<br>
+                            10360 SESVETE<br>
+                            HRVATSKA<br>
+                            OIB: 33514956214
+                        </td>
+                        <td>
+                            <strong>Datum izdavanja:</strong> 09.10.2024 11:42<br>
+                            <strong>Rok plaćanja:</strong> 31.10.2024<br>
+                            <strong>Način plaćanja:</strong> Transakcijski račun<br>
+                            <strong>Mjesto izdavanja:</strong> Đurđekovec<br>
+                            <strong>Model / Poziv na broj:</strong> HR00 20101<br>
+                            <strong>Datum isporuke:</strong> 09.10.2024
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <table class="items-table">
+                <tr>
+                    <th>R.br.</th>
+                    <th>Naziv</th>
+                    <th>Osn. cijena</th>
+                    <th>Popust</th>
+                    <th>Jed. cijena</th>
+                    <th>Količina</th>
+                    <th>Ukupna cijena</th>
+                </tr>
+                <tr>
+                    <td>1.</td>
+                    <td>Oslikavanje kamiona</td>
+                    <td>150,00 EUR</td>
+                    <td>0,00 %</td>
+                    <td>150,00 EUR</td>
+                    <td>1,00</td>
+                    <td>150,00 EUR</td>
+                </tr>
+            </table>
+
+            <div class="summary">
+                <p><strong>Porez (25,00%):</strong> 37,50 EUR<br>
+                <strong>Ukupno s porezom:</strong> 187,50 EUR</p>
+            </div>
+
+            <div class="notes">
+                <p><strong>Napomene:</strong><br>
+                1. Dokument izradio: Matija Kovacic<br>
+                2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Motorsport Innovations and Solutions, Glavna cesta 84, Đurđekovec, 10362<br>OIB: 92531040676<br>Email: matija@kayomotorcycles.eu</p>
+            <p>Stranica 1 / 1</p>
+        </div>
+    </div>
+</body>
+</html>

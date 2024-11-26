@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %} Customer {% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/newCustomer.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
+            <h2>Edit customer info</h2>
+        </div>
+
+        <form method="post" class="customer-form">
+            <label for="customer-name">Name</label>
+            <input type="text" id="customer-name" name="customer-name" value="{{ customer.name }}" required>
+
+            <label for="customer-email">Email</label>
+            <input type="email" id="customer-email" name="customer-email" value="{{ customer.email }}">
+
+            <label for="customer-address">Address</label>
+            <input type="text" id="customer-address" name="customer-address" value="{{ customer.address }}">
+
+            <label for="customer-postal-code">Postal code</label>
+            <input type="text" id="customer-postal-code" name="customer-postal-code" value="{{ customer.postal_code }}">
+
+            <label for="customer-city">City</label>
+            <input type="text" id="customer-city" name="customer-city" value="{{ customer.city }}">
+
+            <label for="customer-country">Country</label>
+            <input type="text" id="customer-country" name="customer-country" value="{{ customer.country }}">
+
+            <label for="customer-id">ID</label>
+            <input type="text" id="customer-id" name="customer-id" value="{{ customer.vat_id }}">
+
+            <div>
+                <button type="submit" class="btn btn-outline-light">Update</button>
+                <a href="../customers" class="btn btn-outline-light">Back</a>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}

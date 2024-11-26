@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% block title %} mInvoices {% endblock %}
-
 {% block content %}
-    <div>
+    <div class="content-container">
         <div class="bck-container">
             <div class="row">
                 <div class="block col d-flex justify-content-center">
@@ -15,17 +14,41 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">Proforma Invoices</h1>
+                        <p>Create and manage proforma invoices with "Proforma Invoices" service.</p>
+                        <img class="icons" src="/static/icons/proforma.svg" alt="Invoice icon">
+                        <div class="m-4">
+                            <a href="/mInvoices/proformaInvoices" class="btn btn-outline-light">Manage</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="block col d-flex justify-content-center">
                     <div class="square text-center">
                         <h1 class="m-3">Invoices</h1>
                         <p>Create and manage invoices with "Invoices" service.</p>
                         <img class="icons" src="/static/icons/invoice.svg" alt="Invoice icon">
                         <div class="m-4">
-                            <a href="/mInvoices/invoices" class="btn btn-outline-light">Create an invoice</a>
+                            <a href="/mInvoices/invoices" class="btn btn-outline-light">Manage</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="block col d-flex justify-content-center">
+                    <div class="square text-center">
+                        <h1 class="m-3">Products</h1>
+                        <p>Create and manage Products with "Products" service.</p>
+                        <img class="icons" src="/static/icons/product.svg" alt="Invoice icon">
+                        <div class="m-4">
+                            <a href="/mInvoices/products" class="btn btn-outline-light">Manage</a>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 {% endblock %}

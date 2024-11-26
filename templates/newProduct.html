@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/newProduct.css') }}">
+{% endblock %}
+
+{% block title %} New Product {% endblock %}
+{% block content %}
+    <div class="new_product_table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/product.svg" alt="Product icon">
+            <h2>New Product</h2>
+        </div>
+
+        <form method="post" class="product-form">
+            <label for="product-name">Product Name</label>
+            <input type="text" id="product-name" name="product-name" required>
+
+            <label for="product-description">Description</label>
+            <textarea id="product-description" name="product-description" rows="4"></textarea>
+
+            <div class="price-and-vat">
+                <div>
+                    <label for="product-price">Price(VAT excluded)</label>
+                    <input type="number" step="0.01" id="product-price" name="product-price" required placeholder="0,00€">
+                </div>
+
+                <div>
+                    <label for="product-vat">VAT</label>
+                    <select id="product-vat" name="product-vat">
+                        <option value="0">None</option>
+                        <option value="25" selected>25%</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" class="btn btn-outline-light">Add Product</button>
+                <a href="../products" class="btn btn-outline-light">Back</a>
+            </div>
+        </form>
+
+    </div>
+{% endblock %}
