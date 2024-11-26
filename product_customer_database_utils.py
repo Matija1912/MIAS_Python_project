@@ -181,12 +181,3 @@ def remove_selected_customer(customer_id, company_id):
     except Exception as e:
         flash('An error has occurred while removing customer. Please try again or contact MIAS.',category='error')
 
-
-
-#USER UTILS
-def check_for_user(email):
-    query = text("SELECT * FROM companies WHERE email = :email")
-    with get_db_connection() as connection:
-        result = connection.execute(query, {"email": email}).fetchone()
-
-    return result

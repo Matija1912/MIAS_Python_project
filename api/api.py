@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required, current_user
-from product_customer_auth_database_utils import get_company_products
+from product_customer_database_utils import get_company_products
 
 api = Blueprint('api', __name__)
 

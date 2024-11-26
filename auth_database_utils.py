@@ -5,6 +5,13 @@ from werkzeug.security import generate_password_hash
 from db_connection import get_db_connection
 
 
+def check_for_user(email):
+    query = text("SELECT * FROM companies WHERE email = :email")
+    with get_db_connection() as connection:
+        result = connection.execute(query, {"email": email}).fetchone()
+
+    return result
+
 def get_user_by_id(id):
     query = text("""SELECT * FROM users
                     JOIN companies ON users.company_id = companies.id

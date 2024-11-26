@@ -6,7 +6,7 @@ from flask_login import login_required
 from models import Customer, Product, Invoice
 
 #DATABSE UTILS
-from product_customer_auth_database_utils import *
+from product_customer_database_utils import *
 from invoice_proforma_database_utils import *
 
 
