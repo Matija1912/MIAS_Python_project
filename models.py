@@ -50,11 +50,12 @@ class Customer:
         return self.name + " " + self.email + " " + self.address + " " + self.postal_code + " " + self.city + " " + self.country + " " + self.vat_id
 
 class Product:
-    def __init__(self, name, description, price_no_vat, vat_percentage):
+    def __init__(self, name, description, price, vat_percentage, vat_status):
         self.name = name
         self.description = description
-        self.price_no_vat = price_no_vat
+        self.price = price
         self.vat_percentage = vat_percentage
+        self.vat_status = vat_status
         self.stock = 0
 
 class Invoice:

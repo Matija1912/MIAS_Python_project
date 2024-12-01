@@ -44,6 +44,7 @@ def products():
     product_count = get_company_product_count(current_user.company.id)[0]
     page_count = ((product_count - 1) // per_page) + 1
     _products = get_company_products(current_user.company.id, per_page, offset)
+    print(_products[0])
     return render_template('products.html', user=current_user, products=_products, page=page, per_page=per_page, page_count=page_count)
 
 @mInvoicesViews.route('/customers/newCustomer', methods=['GET', 'POST'])
@@ -71,15 +72,16 @@ def add_new_product():
     if request.method == 'POST':
         name = request.form.get('product-name')
         description = request.form.get('product-description')
-        price_no_vat = request.form.get('product-price')
+        price = request.form.get('product-price')
         vat_percentage = request.form.get('product-vat')
+        vat_status = bool(request.form.get('vat-status'))
 
-        if name and price_no_vat and vat_percentage:
+        if name and price and vat_percentage:
             try:
-                _price = Decimal(price_no_vat)
+                _price = Decimal(price)
                 _vat = Decimal(vat_percentage)
 
-                new_product = Product(name, description, float(_price), float(_vat))
+                new_product = Product(name, description, float(_price), float(_vat), vat_status)
                 add_new_product_to_db(new_product)
 
             except InvalidOperation:
@@ -125,14 +127,15 @@ def product():
     if res:
         _price = Decimal(res[3])
         _vat = Decimal(res[4])
-        selected_product = Product(res[1], res[2], _price, _vat)
+        selected_product = Product(res[1], res[2], _price, _vat, res[7])
         if request.method == 'POST':
             name = request.form.get('product-name')
             description = request.form.get('product-description')
             price = request.form.get('product-price')
             vat = request.form.get('product-vat')
+            vat_status = bool(request.form.get('vat-status'))
 
-            updated_product_info = Product(name, description, price, vat)
+            updated_product_info = Product(name, description, price, vat, vat_status)
             update_product_info(updated_product_info, product_id)
 
             return redirect(url_for('mInvoicesViews.products'))

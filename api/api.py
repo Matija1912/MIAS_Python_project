@@ -12,6 +12,6 @@ def fetch_products():
     limit = 25
     offset = 0
     products = get_company_products(company_id, limit, offset)
-    keys = ['id', 'name', 'description', 'price_no_vat', 'vat_percentage', 'stock', 'company_id']
+    keys = ['id', 'name', 'description', 'price', 'vat_percentage', 'stock', 'company_id', 'vat_status']
     dict_list = [dict(zip(keys, product)) for product in products]
     return jsonify(dict_list)

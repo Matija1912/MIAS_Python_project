@@ -29,8 +29,8 @@ def get_company_product_count(company_id):
 
 def add_new_product_to_db(_product):
     query = text("""INSERT INTO products 
-           (name, description, price_no_vat, vat_percentage, company_id)
-           VALUES (:name, :description, :price_no_vat, :vat_percentage, :company_id)
+           (name, description, price, vat_percentage, company_id, vat_status)
+           VALUES (:name, :description, :price, :vat_percentage, :company_id, :vat_status)
            """)
 
     try:
@@ -39,9 +39,10 @@ def add_new_product_to_db(_product):
                 connection.execute(query, {
                     "name": _product.name,
                     "description": _product.description,
-                    "price_no_vat": _product.price_no_vat,
+                    "price": _product.price,
                     "vat_percentage": _product.vat_percentage,
-                    "company_id": current_user.company.id
+                    "company_id": current_user.company.id,
+                    "vat_status": _product.vat_status
                 })
                 flash('You have added a new product!', category='success')
     except Exception as e:
@@ -54,8 +55,9 @@ def update_product_info(updated_product_info, product_id):
         SET
         name = :name,
         description = :description,
-        price_no_vat = :price_no_vat,
-        vat_percentage = :vat_percentage
+        price = :price,
+        vat_percentage = :vat_percentage,
+        vat_status = :vat_status
         WHERE id = :id 
     """)
     try:
@@ -64,8 +66,9 @@ def update_product_info(updated_product_info, product_id):
                 connection.execute(query, {
                     "name": updated_product_info.name,
                     "description": updated_product_info.description,
-                    "price_no_vat": updated_product_info.price_no_vat,
+                    "price": updated_product_info.price,
                     "vat_percentage": updated_product_info.vat_percentage,
+                    "vat_status": updated_product_info.vat_status,
                     "id": product_id
                 })
                 flash('Update successful', category="success")

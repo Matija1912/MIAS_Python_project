@@ -21,6 +21,7 @@
                 <tr>
                     <th>Name</th>
                     <th>Price(no VAT)</th>
+                    <th>Price(with VAT)</th>
                     <th>VAT</th>
                     <th>Stock</th>
                     <th>Action</th>
@@ -30,7 +31,13 @@
                 {% for product in products %}
                     <tr class="customer-product-instance">
                         <td >{{ product.name }}</td>
-                        <td>{{ product.price_no_vat }}€</td>
+                        {% if product.vat_status == 0 %}
+                            <td>{{ "%.2f" % product.price }}€</td>
+                            <td>{{ "%.2f" % (product.price + (product.price * product.vat_percentage/100)) }}€</td>
+                        {% else %}
+                            <td>{{"%.2f" % (product.price/(1+(product.vat_percentage/100))) }}€</td>
+                            <td>{{"%.2f" % product.price }}€</td>
+                        {% endif %}
                         <td>{{ product.vat_percentage }}</td>
                         <td>{{ product.stock }}</td>
                         <td>

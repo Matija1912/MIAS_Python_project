@@ -23,7 +23,7 @@
             <div class="price-and-vat">
                 <div>
                     <label for="product-price">Price(VAT excluded)</label>
-                    <input type="number" step="0.01" id="product-price" name="product-price" value="{{ product.price_no_vat }}" required>
+                    <input type="number" step="0.01" id="product-price" name="product-price" value="{{ product.price }}" required>
                 </div>
 
                 <div>
@@ -38,6 +38,14 @@
                         {% endif %}
                     </select>
                 </div>
+            </div>
+            <div>
+                <label for="vat-status">Price with VAT</label>
+                {% if product.vat_status %}
+                    <input type="checkbox" name="vat-status" id="vat-status" checked>
+                {% else %}
+                    <input type="checkbox" name="vat-status" id="vat-status">
+                {% endif %}
             </div>
 
             <div>
