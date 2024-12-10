@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Dec 10, 2024 at 09:07 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Dec 10, 2024 at 10:46 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.0.28
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -164,7 +164,11 @@ CREATE TABLE `invoices` (
 --
 
 INSERT INTO `invoices` (`id`, `customer_id`, `invoice_with_vat`, `status`, `created_at`, `invoice_number`, `company_id`, `invoice_office_number`, `invoice_device_number`, `note`) VALUES
-(38, 7, 1, 'Pending', '2024-12-10 19:23:00', 1, 2, 1, 1, '1. Dokument izradio: Domagoj Lepen\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    ');
+(1, 2, 1, 'Pending', '2024-12-10 21:32:00', 1, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(2, 1, 1, 'Pending', '2024-12-10 21:33:00', 2, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(3, 7, 1, 'Pending', '2024-12-10 21:34:00', 1, 2, 1, 1, '1. Dokument izradio: Domagoj Lepen\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(4, 7, 1, 'Pending', '2024-12-10 21:45:00', 2, 2, 1, 1, '1. Dokument izradio: Domagoj Lepen\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(5, 1, 1, 'Pending', '2024-12-10 21:45:00', 3, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    ');
 
 -- --------------------------------------------------------
 
@@ -175,7 +179,7 @@ INSERT INTO `invoices` (`id`, `customer_id`, `invoice_with_vat`, `status`, `crea
 CREATE TABLE `invoice_counter` (
   `year` int(4) NOT NULL,
   `next_invoice_number` int(11) NOT NULL DEFAULT 0,
-  `company_id` int(11) DEFAULT NULL
+  `company_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -183,7 +187,8 @@ CREATE TABLE `invoice_counter` (
 --
 
 INSERT INTO `invoice_counter` (`year`, `next_invoice_number`, `company_id`) VALUES
-(2024, 1, 2);
+(2024, 3, 1),
+(2024, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -207,7 +212,12 @@ CREATE TABLE `invoice_items` (
 --
 
 INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `discount`, `product_price_no_vat`, `product_description`, `vat_percentage`) VALUES
-(21, 38, 12, 1, 0.00, 1195.95, 'Product1 description', 25.00);
+(1, 1, 5, 1, 0.00, 1000.00, 'Kayo TS90 pit bike.\nVIN:', 25.00),
+(2, 2, 13, 1, 0.00, 4600.00, 'Kayo K6 motocikl.\nVIN: ', 25.00),
+(3, 2, 7, 10, 20.00, 1200.00, 'Kayo TT140 pit bike.\nVIN: ', 25.00),
+(4, 3, 12, 1, 0.00, 1195.95, 'Product1 description', 25.00),
+(5, 4, 12, 1, 0.00, 1195.95, 'Product1 description', 25.00),
+(6, 5, 9, 1, 0.00, 1840.00, 'Kayo K2 Enduro motocikl.\nVIN: ', 25.00);
 
 -- --------------------------------------------------------
 
@@ -296,7 +306,7 @@ ALTER TABLE `invoices`
 -- Indexes for table `invoice_counter`
 --
 ALTER TABLE `invoice_counter`
-  ADD PRIMARY KEY (`year`),
+  ADD PRIMARY KEY (`year`,`company_id`),
   ADD KEY `fk_cinvoice_counter_company_id` (`company_id`);
 
 --
@@ -342,13 +352,13 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `products`

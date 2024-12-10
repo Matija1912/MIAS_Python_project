@@ -127,7 +127,7 @@ def create_new_invoice(company_id, invoice, _year, invoice_products):
                 })
 
                 last_insert_id = connection.execute(query_last_inserted_invoice, {
-                    "invoice_number": next_invoice_number[0],
+                    "invoice_number": invoice.invoice_number,
                     "invoice_year": _year,
                     "company_id": company_id
                 }).fetchone()[0]
@@ -175,8 +175,6 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
     try:
         with get_db_connection() as connection:
             with connection.begin():
-                print(company_id)
-                print(_year)
                 connection.execute(update_counter_query, {
                     "_company_id": company_id,
                     "_year": _year,
@@ -203,7 +201,6 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
                     "invoice_year": _year,
                     "company_id": company_id
                 }).fetchone()[0]
-                print(last_insert_id)
 
                 for item in invoice_products:
                     connection.execute(query_items, {
