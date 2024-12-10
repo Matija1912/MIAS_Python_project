@@ -35,10 +35,10 @@
                         <td>{{ invoice.formatted_date }}</td>
                         <td>{{ invoice.customer_name }}</td>
                         <td>{{ invoice.status }}</td>
-                        <td>{{ invoice.amount_total_with_vat }}({{ invoice.amount_total_no_vat }})</td>
+                        <td>{{ invoice.discounted_total }}€({{ invoice.total_with_vat }}€)</td>
                         <td>
                             <form class="edit-delete" method="post" onsubmit="return confirm('Are you sure you wish to delete?');">
-                                <button type="button" class="btn btn-light" onclick="window.location='/mInvoices/customers/invoice?id={{ invoice.id }}';">
+                                <button type="button" class="btn btn-light" onclick="window.location='/mInvoices/invoices/invoice?id={{ invoice.id }}';">
                                     <img src="../static/icons/pen.svg">
                                 </button>
                                 <input type="hidden" name="invoice_id" value="{{ invoice.id }}">

@@ -68,8 +68,9 @@ class Invoice:
         self.status = status
         self.with_vat = with_vat
         self.note = note
+
     def __repr__(self):
-        return self.customer + " " + self.invoice_number + "/" + self.invoice_device_number + "/" + self.invoice_office_number + " " + self.created_at + " " + self.status
+        return str(self.invoice_number) + "/" + str(self.invoice_office_number) + "/"+ str(self.invoice_device_number)
 
     def get_formatted_reference(self):
         return f"{self.invoice_number:02}/{self.invoice_device_number:02}/{self.invoice_office_number:02}"

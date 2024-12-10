@@ -13,7 +13,7 @@
             <h2>New Invoice</h2>
         </div>
         <hr>
-        <form method="post" class="invoice-form">
+        <form method="post" class="invoice-form" id="invoice-form">
             <h2>Invoice data:</h2>
             <div class="group">
                 <label for="invoice-number">Invoice number</label>
@@ -97,7 +97,7 @@
                     </div>
 
                     <div class="group">
-                        <label for="vat_status">Price with vat</label>
+                        <label for="vat-status">Price with vat</label>
                         <input type="checkbox" id="vat-status" name="vat-status">
                     </div>
 
@@ -225,6 +225,60 @@
 
     <script>
 
+        const productList = [];
+
+        document.getElementById('invoice-form').addEventListener('submit', function (event){
+            event.preventDefault();
+            submitInvoice();
+        })
+
+        async function submitInvoice(){
+            const invoice_number = document.getElementById('invoice-number').value;
+            const invoice_date_time = document.getElementById('invoice-date-time').value;
+            const invoice_customer = document.getElementById('customer-id').value;
+            const vat_status = document.getElementById('invoice-with-vat').checked;
+            const invoice_note = document.getElementById('invoice-note').value;
+
+            if(productList.length === 0){
+                alert("No product added!");
+                return;
+            }
+
+            if(!invoice_date_time || !invoice_customer){
+                alert('Fill out the form please.');
+                return;
+            }
+
+            const invoiceData = {
+                invoiceNumber: invoice_number,
+                invoiceDateTime: invoice_date_time,
+                customer: invoice_customer,
+                vatStatus: vat_status,
+                invoiceNote: invoice_note,
+                productList: productList
+            }
+
+            try {
+                const res = await fetch('/mInvoices/invoices/newInvoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(invoiceData)
+                });
+                if(res.ok){
+                    window.location = '/mInvoices/invoices';
+                }else{
+                    const err = await res.json();
+                    alert(err.error)
+                }
+            }catch (err){
+                alert(err);
+            }
+
+
+        }
+
         async function fetchProducts(){
             const dropdown = document.getElementById('product-dropdown')
             if (dropdown.options.length > 1){
@@ -260,6 +314,7 @@
                 document.getElementById('vat-percentage').value = selectedOption.vat_percentage;
                 document.getElementById('vat-status').checked = selectedOption.vat_status !== 0;
 
+
             }else {
                 document.getElementById('product-id').value = '';
                 document.getElementById('product-name').value = '';
@@ -275,20 +330,20 @@
             const productId = document.getElementById('product-id').value;
             const productName = document.getElementById('product-name').value;
             const productAmount = document.getElementById('amount').value;
-            const productPrice = document.getElementById('price').value;
+            const baseProductPrice = document.getElementById('price').value;
             const productDiscount = document.getElementById('discount').value;
             const productDescription = document.getElementById('description').value;
             const productVat = document.getElementById('vat-percentage').value;
-            const productVatStatus = document.getElementById('vat-status').value;
-
-            console.log(productVatStatus);
-
-            if(!productId || !productName || !productAmount || !productPrice || !productDiscount){
+            const productVatStatus = document.getElementById('vat-status').checked;
+            if(!productId || !productName || !productAmount || !baseProductPrice || !productDiscount){
                 alert('Please fill in all the fields!')
                 return
             }
 
-
+            let productPrice = baseProductPrice;
+            if(productVatStatus === true){
+                productPrice = (productPrice/(1+(productVat*0.01)));
+            }
             const total = productPrice * productAmount;
 
             const tableBody = document.getElementById('product-table').querySelector('tbody');
@@ -325,9 +380,19 @@
                         <img src="/static/icons/trash.svg">
                     </button>
                 </td>
-
             `
             tableBody.prepend(row);
+
+
+            productList.push({
+                id: Number(productId),
+                quantity: Number(productAmount),
+                price: Number(productPrice),
+                discount: Number(productDiscount),
+                description: productDescription,
+                vatPercentage: Number(productVat)
+            })
+
             updateTotal();
         }
 

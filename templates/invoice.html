@@ -1,58 +1,268 @@
 {% extends "base.html" %}
-{% block title %} Product {% endblock %}
+{% block title %} Invoice: {{ invoice }} {% endblock %}
 
 {% block custom_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/newProduct.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/newInvoice.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tables.css') }}">
 {% endblock %}
 
 {% block content %}
-    <div class="new_product_table_container">
+
+    <div class="new_invoice_table_container">
         <div class="title_container">
-            <img class="title_icon" src="/static/icons/customer.svg" alt="Invoice icon">
-            <h2>Edit product info</h2>
+            <img class="title_icon" src="/static/icons/invoice.svg" alt="Product icon">
+            <h2>Invoice {{ invoice }}</h2>
         </div>
-
-         <form method="post" class="product-form">
-            <label for="product-name">Product Name</label>
-            <input type="text" id="product-name" name="product-name" value="{{ product.name }}" required>
-
-            <label for="product-description">Description</label>
-            <textarea id="product-description" name="product-description" rows="4">{{ product.description }}</textarea>
-
-            <div class="price-and-vat">
+        <hr>
+        <form method="post" class="invoice-form" id="invoice-form">
+            <h2>Invoice data:</h2>
+            <div class="group">
+                <label for="invoice-number">Invoice number</label>
+                <input type="text" id="invoice-number" name="invoice-number" value="{{ invoice.invoice_number }}">
+            </div>
+            <div>
                 <div>
-                    <label for="product-price">Price(VAT excluded)</label>
-                    <input type="number" step="0.01" id="product-price" name="product-price" value="{{ product.price }}" required>
+                     <label for="invoice-date-time">Invoice date and time</label>
                 </div>
-
                 <div>
-                    <label for="product-vat">VAT</label>
-                    <select id="product-vat" name="product-vat">
-                        {% if product.vat_percentage == 25 %}
-                            <option value="0">None</option>
-                            <option value="25" selected>25%</option>
-                        {% else %}
-                             <option value="0" selected>None</option>
-                            <option value="25">25%</option>
-                        {% endif %}
+                    <input type="datetime-local" id="invoice-date-time" name="invoice-date-time" value="{{ year }}-{{ date }}T{{ time }}">
+                </div>
+            </div>
+            <div class="search-select-box">
+                <div class="select-option">
+                    <label for="invoice-customer">Customer</label>
+                    <input type="text" id="soValue" readonly name="invoice-customer" value="{{ invoice_customer_name }}">
+                    <input type="hidden" id="customer-id" name="customer-id" value="{{ invoice_customer_id }}">
+                </div>
+                <div class="content">
+                    <div class="search">
+                        <input type="text" id="optionSearch" placeholder="Search" name="">
+                    </div>
+                    <ul class="options">
+                        {% for customer in customers %}
+                            <li data-id="{{ customer.id }}">{{ customer.name }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div>
+                <label for="invoice-with-vat">Invoice with VAT</label>
+                <input type="checkbox" id="invoice-with-vat" name="invoice-with-vat" checked>
+            </div>
+
+            <div>
+                <div class="group">
+                    <label for="invoice-note">Invoice note:</label>
+                    <textarea id="invoice-note" name="invoice-note" rows="4" cols="38">
+{{ invoice.note }}
+                    </textarea>
+                </div>
+            </div>
+            <hr>
+            <h2>Products:</h2>
+
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <h2>Add product</h2>
+
+                    <div class="group">
+                        <label for="product">Product:</label>
+                        <input type="hidden" id="product-id" name="product-id">
+                        <input type="hidden" id="product-name" name="product-name">
+                        <select id="product-dropdown" class="product" onclick="fetchProducts()">
+                            <option value="default" selected>Select a product</option>
+
                     </select>
+                    </div>
+
+                    <div class="group">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" name="amount" min="1" value="1">
+                    </div>
+
+                    <div class="group">
+                        <label for="price">Price</label>
+                        <input type="number" step="0.01" id="price" name="price">
+                    </div>
+
+                    <div class="group">
+                        <label for="discount">Discount (%)</label>
+                        <input type="number" min="0" max="100" step="0.01" id="discount" name="discount" value="0">
+                    </div>
+
+                    <div class="group">
+                        <label for="vat-percentage">VAT (%)</label>
+                        <input type="number" min="0" max="100" step="0.01" id="vat-percentage" name="vat-percentage" value="0">
+                    </div>
+
+                    <div class="group">
+                        <label for="vat-status">Price with vat</label>
+                        <input type="checkbox" id="vat-status" name="vat-status">
+                    </div>
+
+                    <div class="group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4"></textarea>
+                    </div>
+
+                    <div>
+                        <button type="button" id="add" class="btn btn-outline-light" onclick="addProduct()">Add</button>
+                        <button type="button" id="close-popup" class="btn btn-outline-light">Close</button>
+                    </div>
+
                 </div>
             </div>
-            <div>
-                <label for="vat-status">Price with VAT</label>
-                {% if product.vat_status %}
-                    <input type="checkbox" name="vat-status" id="vat-status" checked>
-                {% else %}
-                    <input type="checkbox" name="vat-status" id="vat-status">
-                {% endif %}
+
+            <div class="table_container">
+                <table id="product-table" class="customers_product_table">
+                    <thead class="customers_product_columns">
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Price(no VAT)</th>
+                            <th>Amount</th>
+                            <th>VAT</th>
+                            <th>Total</th>
+                            <th>VAT total</th>
+                            <th>Total with VAT</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="customer_product_data_columns">
+                    {% for item in invoice_items %}
+                        <tr class="customer-product-instance">
+                            <td>
+                                {{ item["product_name"] }}
+                            </td>
+                            <td>
+                                {{ item["product_description"] }}
+                            </td>
+                            <td data-price="{{ item["price_no_vat"] }}">
+
+                            </td>
+                            <td>
+                                {{ item["quantity"] }}
+                            </td>
+                            <td>
+                                {{ item["vat_percentage"] }}
+                            </td>
+                            <td data-price="{{ item["price_no_vat"] * item["quantity"] }}">
+
+                            </td>
+                            <td data-price="{{ (item['price_no_vat'] | float) * (item['quantity'] | float) * (item['vat_percentage'] | float) * 0.01 }}">
+
+
+                            </td>
+                            <td data-price="{{ ((item["price_no_vat"] | float) * (item["quantity"] | float)) + ((item['price_no_vat'] | float) * (item['quantity'] | float) * (item['vat_percentage'] | float) * 0.01) }}">
+                                asd
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-light" onclick="removeProduct(this)">
+                                    <img src="/static/icons/trash.svg">
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    <tfoot class="customer_product_data_columns">
+                        <tr id="total-row">
+                            <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
+                            <td id="total-price">0,00</td>
+                            <td id="total-vat">0,00</td>
+                            <td colspan="2" id="total-with-vat">0,00</td>
+                        </tr>
+                        <tr class="customer-product-instance">
+                            <td colspan="9" style="text-align: center;">
+                                <button type="button" id="open-popup" class="btn btn-outline-light">Add product</button>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
 
-            <div>
-                <button type="submit" class="btn btn-outline-light">Update</button>
-                <a href="../products" class="btn btn-outline-light">Back</a>
+            <div class="group">
+                <button type="submit" class="btn btn-outline-light">Update invoice</button>
+                <a href="../invoices" class="btn btn-outline-light">Back</a>
             </div>
         </form>
-
     </div>
+
+    <script>
+        window.onload = updateTotal;
+        function formatNumbers(n){
+                return new Intl.NumberFormat('de-DE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+                }).format(n)
+            }
+        document.querySelectorAll('[data-price]').forEach((cell) => {
+            const rawValue = parseFloat(cell.getAttribute('data-price'));
+            cell.textContent = `${formatNumbers(rawValue)}`;
+        });
+
+         function updateTotal(){
+            const tableBody = document.getElementById('product-table').querySelector('tbody')
+            let totalPrice = 0;
+            let totalVat = 0;
+            let totalWithVat = 0;
+
+            Array.from(tableBody.rows).forEach(r => {
+                let price = parseFloat(r.cells[5]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let vat = parseFloat(r.cells[6]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let totalWVat = parseFloat(r.cells[7]?.textContent.replace('.', '').replace(',', '.')) || 0;
+
+
+                totalPrice += price || 0;
+                totalVat += vat || 0;
+                totalWithVat += totalWVat || 0;
+            })
+
+            document.getElementById('total-price').textContent = formatNumbers(totalPrice);
+            document.getElementById('total-vat').textContent = formatNumbers(totalVat);
+            document.getElementById('total-with-vat').textContent = formatNumbers(totalWithVat);
+
+        }
+
+    </script>
+
+    <script>
+        const searchSelectBox = document.querySelector('.search-select-box')
+        const selectOption = document.querySelector('.select-option')
+        const soValue = document.querySelector('#soValue')
+        const optionSearch = document.querySelector('#optionSearch')
+        const options = document.querySelector('.options')
+        const optionsList = document.querySelectorAll('.options li')
+        const hiddenInput = document.getElementById('customer-id')
+
+        selectOption.addEventListener('click', function (){
+            searchSelectBox.classList.toggle('active')
+        })
+
+        optionsList.forEach(function(element){
+            element.addEventListener("click", function (){
+                text = this.textContent
+                soValue.value = text
+                searchSelectBox.classList.remove('active')
+                hiddenInput.value = this.getAttribute('data-id')
+            })
+        })
+
+        optionSearch.addEventListener('keyup', function (){
+            var filter, li, i, textValue
+            filter = optionSearch.value.toUpperCase()
+            li = options.getElementsByTagName('li')
+            for(i = 0; i < li.length; i++){
+                e = li[i]
+                textValue = e.textContent || e.innerText
+                if(textValue.toUpperCase().indexOf(filter) > -1){
+                    li[i].style.display = ''
+                }else{
+                    li[i].style.display = 'none'
+                }
+            }
+        })
+
+    </script>
+
 {% endblock %}

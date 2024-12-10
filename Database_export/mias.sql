@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 26, 2024 at 10:14 PM
+-- Generation Time: Dec 10, 2024 at 09:07 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,16 +33,16 @@ DECLARE max_invoice_number INT;
     INTO _invoice_year
     FROM invoices
     WHERE id = in_invoice_id AND company_id = in_company_id;
-    
+
     UPDATE invoices
     SET invoices.company_id = NULL
     WHERE invoices.id = in_invoice_id AND invoices.company_id = in_company_id;
-   
+
 	SELECT COALESCE(MAX(invoices.invoice_number), 0)
     INTO max_invoice_number
     FROM invoices
     WHERE invoices.company_id = in_company_id AND invoices.invoice_year = _invoice_year;
-    
+
     UPDATE invoice_counter
     SET invoice_counter.next_invoice_number = max_invoice_number
     WHERE invoice_counter.year = _invoice_year
@@ -56,13 +56,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateInvoiceCounter` (IN `_company
     SELECT ic.next_invoice_number INTO current_invoice_number
     FROM invoice_counter ic
     WHERE ic.year = _year AND ic.company_id = _company_id;
-    
+
     IF current_invoice_number IS NULL THEN
     	 INSERT INTO invoice_counter (year, company_id, next_invoice_number)
          VALUES (_year, _company_id, 0);
          SET current_invoice_number= 0;
 	END IF;
-    
+
     IF _invoice_number > current_invoice_number THEN
         UPDATE invoice_counter
         SET next_invoice_number = _invoice_number
@@ -77,7 +77,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `UpdateInvoiceCounterAutoGen` (IN `_
     WHERE ic.year = _year AND ic.company_id = _company_id;
 
     IF ROW_COUNT() = 0 THEN
-  
+
         INSERT INTO invoice_counter (invoice_counter.year, invoice_counter.company_id, invoice_counter.next_invoice_number)
         VALUES (_year, _company_id, 1);
     END IF;
@@ -136,7 +136,8 @@ CREATE TABLE `customers` (
 INSERT INTO `customers` (`id`, `name`, `email`, `street`, `post_number`, `city`, `country`, `vat_id`, `registration_number`, `phone`, `fax`, `company_id`) VALUES
 (1, 'AUTO CENTAR IVKOVIĆ d.o.o.', 'autocentarivkovic1@gmail.com', 'Čepljani, Piceti 52 B', '52470', 'Umag', 'Hrvatska', '07518901102', NULL, NULL, NULL, 1),
 (2, 'AGRO MAK d.o.o.', 'info.agromak@gmail.com', 'Ulica 30. svibnja 50', '33000', 'Milanovac', 'Hrvatska', '42835023837', NULL, NULL, NULL, 1),
-(6, 'ENDURO MOTO SPORT D.O.O.', 'enduromotosport113@gmail.com', 'Tugonica 128A', '49246', 'Marija Bistrica', 'Hrvatska', '36910638020', NULL, NULL, NULL, 1);
+(6, 'ENDURO MOTO SPORT D.O.O.', 'enduromotosport113@gmail.com', 'Tugonica 128A', '49246', 'Marija Bistrica', 'Hrvatska', '36910638020', NULL, NULL, NULL, 1),
+(7, 'Customer1', 'customer1@email.com', 'customer 1a', '1000', 'City', 'Country', '71363415', NULL, NULL, NULL, 2);
 
 -- --------------------------------------------------------
 
@@ -145,7 +146,7 @@ INSERT INTO `customers` (`id`, `name`, `email`, `street`, `post_number`, `city`,
 --
 
 CREATE TABLE `invoices` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` int(11) NOT NULL,
   `customer_id` int(11) DEFAULT NULL,
   `invoice_with_vat` tinyint(1) NOT NULL,
   `status` varchar(20) DEFAULT 'Pending',
@@ -163,7 +164,7 @@ CREATE TABLE `invoices` (
 --
 
 INSERT INTO `invoices` (`id`, `customer_id`, `invoice_with_vat`, `status`, `created_at`, `invoice_number`, `company_id`, `invoice_office_number`, `invoice_device_number`, `note`) VALUES
-(1, 1, 1, 'Pending', '2024-11-24 10:36:00', 1, 1, 1, 1, '1. Dokument izradio: Matija Kovacic\r\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\r\n                    ');
+(38, 7, 1, 'Pending', '2024-12-10 19:23:00', 1, 2, 1, 1, '1. Dokument izradio: Domagoj Lepen\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    ');
 
 -- --------------------------------------------------------
 
@@ -182,7 +183,31 @@ CREATE TABLE `invoice_counter` (
 --
 
 INSERT INTO `invoice_counter` (`year`, `next_invoice_number`, `company_id`) VALUES
-(2024, 1, 1);
+(2024, 1, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `invoice_items`
+--
+
+CREATE TABLE `invoice_items` (
+  `id` int(11) NOT NULL,
+  `invoice_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `discount` decimal(10,2) DEFAULT 0.00,
+  `product_price_no_vat` decimal(10,2) DEFAULT NULL,
+  `product_description` text DEFAULT NULL,
+  `vat_percentage` decimal(5,2) DEFAULT 0.00
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `invoice_items`
+--
+
+INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `discount`, `product_price_no_vat`, `product_description`, `vat_percentage`) VALUES
+(21, 38, 12, 1, 0.00, 1195.95, 'Product1 description', 25.00);
 
 -- --------------------------------------------------------
 
@@ -191,24 +216,27 @@ INSERT INTO `invoice_counter` (`year`, `next_invoice_number`, `company_id`) VALU
 --
 
 CREATE TABLE `products` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+  `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `description` text DEFAULT NULL,
-  `price_no_vat` decimal(10,2) NOT NULL,
+  `price` decimal(10,2) NOT NULL,
   `vat_percentage` decimal(5,2) DEFAULT 0.00,
   `stock` int(11) DEFAULT 0,
-  `company_id` int(11) DEFAULT NULL
+  `company_id` int(11) DEFAULT NULL,
+  `vat_status` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `name`, `description`, `price_no_vat`, `vat_percentage`, `stock`, `company_id`) VALUES
-(5, 'Kayo TS90', 'Kayo TS90 pit bike.\r\nVIN:', 1000.00, 25.00, 0, 1),
-(7, 'KAYO TT140', 'Kayo TT140 pit bike.\r\nVIN: ', 1200.00, 25.00, 0, 1),
-(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 0, 1),
-(12, 'Product1', 'Product1 description', 1195.95, 25.00, 0, 2);
+INSERT INTO `products` (`id`, `name`, `description`, `price`, `vat_percentage`, `stock`, `company_id`, `vat_status`) VALUES
+(5, 'KAYO TS90', 'Kayo TS90 pit bike.\r\nVIN:', 1000.00, 25.00, 0, 1, 0),
+(7, 'KAYO TT140', 'Kayo TT140 pit bike.\r\nVIN: ', 1200.00, 25.00, 0, 1, 0),
+(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 0, 1, 0),
+(12, 'Product1', 'Product1 description', 1195.95, 25.00, 0, 2, 0),
+(13, 'KAYO K6', 'Kayo K6 motocikl.\r\nVIN: ', 4600.00, 25.00, 0, 1, 0),
+(14, 'Dostava', 'Usluga dostave', 100.00, 25.00, 0, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -272,6 +300,14 @@ ALTER TABLE `invoice_counter`
   ADD KEY `fk_cinvoice_counter_company_id` (`company_id`);
 
 --
+-- Indexes for table `invoice_items`
+--
+ALTER TABLE `invoice_items`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_invoice` (`invoice_id`),
+  ADD KEY `fk_product` (`product_id`);
+
+--
 -- Indexes for table `products`
 --
 ALTER TABLE `products`
@@ -300,19 +336,25 @@ ALTER TABLE `companies`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+
+--
+-- AUTO_INCREMENT for table `invoice_items`
+--
+ALTER TABLE `invoice_items`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -342,6 +384,13 @@ ALTER TABLE `invoices`
 --
 ALTER TABLE `invoice_counter`
   ADD CONSTRAINT `fk_cinvoice_counter_company_id` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`);
+
+--
+-- Constraints for table `invoice_items`
+--
+ALTER TABLE `invoice_items`
+  ADD CONSTRAINT `fk_invoice` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_product` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `products`
