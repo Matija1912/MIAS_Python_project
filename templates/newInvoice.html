@@ -238,6 +238,11 @@
             const vat_status = document.getElementById('invoice-with-vat').checked;
             const invoice_note = document.getElementById('invoice-note').value;
 
+            if(!invoice_date_time || !invoice_customer){
+                alert('Fill out the form please.');
+                return;
+            }
+
             const rows = document.querySelectorAll("#product-table tbody tr");
             rows.forEach(row => {
                 const productId = row.querySelector("td[data-raw-id]").dataset.rawId;
@@ -259,11 +264,6 @@
 
             if(productList.length === 0){
                 alert("No product added!");
-                return;
-            }
-
-            if(!invoice_date_time || !invoice_customer){
-                alert('Fill out the form please.');
                 return;
             }
 
@@ -293,6 +293,7 @@
                 alert(err);
             }
 
+            productList = [];
 
         }
 
