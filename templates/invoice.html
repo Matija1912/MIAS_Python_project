@@ -114,6 +114,58 @@
                 </div>
             </div>
 
+            <div id="popup" class="popup">
+                <div class="popup-content">
+                    <h2>Add product</h2>
+
+                    <div class="group">
+                        <label for="product">Product:</label>
+                        <input type="hidden" id="product-id" name="product-id">
+                        <input type="hidden" id="product-name" name="product-name">
+                        <select id="product-dropdown" class="product" onclick="fetchProducts()">
+                            <option value="default" selected>Select a product</option>
+
+                    </select>
+                    </div>
+
+                    <div class="group">
+                        <label for="amount">Amount</label>
+                        <input type="number" id="amount" name="amount" min="1" value="1">
+                    </div>
+
+                    <div class="group">
+                        <label for="price">Price</label>
+                        <input type="number" step="0.01" id="price" name="price">
+                    </div>
+
+                    <div class="group">
+                        <label for="discount">Discount (%)</label>
+                        <input type="number" min="0" max="100" step="0.01" id="discount" name="discount" value="0">
+                    </div>
+
+                    <div class="group">
+                        <label for="vat-percentage">VAT (%)</label>
+                        <input type="number" min="0" max="100" step="0.01" id="vat-percentage" name="vat-percentage" value="0">
+                    </div>
+
+                    <div class="group">
+                        <label for="vat-status">Price with vat</label>
+                        <input type="checkbox" id="vat-status" name="vat-status">
+                    </div>
+
+                    <div class="group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" rows="4"></textarea>
+                    </div>
+
+                    <div>
+                        <button type="button" id="add" class="btn btn-outline-light" onclick="addProduct()">Add</button>
+                        <button type="button" id="close-popup" class="btn btn-outline-light">Close</button>
+                    </div>
+
+                </div>
+            </div>
+
             <div class="table_container">
                 <table id="product-table" class="customers_product_table">
                     <thead class="customers_product_columns">
@@ -126,25 +178,29 @@
                             <th>Total</th>
                             <th>VAT total</th>
                             <th>Total with VAT</th>
+                            <th>Discount</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="customer_product_data_columns">
                     {% for item in invoice_items %}
                         <tr class="customer-product-instance">
-                            <td>
-                                {{ item["product_name"] }}
-                            </td>
-                            <td>
-                                {{ item["product_description"] }}
-                            </td>
-                            <td data-price="{{ item["price_no_vat"] }}">
+                            <td style="display:none"  data-raw-id="{{ item["product_id"] }}">
 
                             </td>
                             <td>
+                                {{ item["product_name"] }}
+                            </td>
+                            <td data-raw-description="{{ item["product_description"] }}">
+                                {{ item["product_description"] }}
+                            </td>
+                            <td data-price="{{ item["price_no_vat"] }}" data-raw-price="{{ item["price_no_vat"] }}">
+
+                            </td>
+                            <td data-raw-quantity="{{ item["quantity"] }}">
                                 {{ item["quantity"] }}
                             </td>
-                            <td>
+                            <td data-raw-vat-percentage="{{ item["vat_percentage"] }}">
                                 {{ item["vat_percentage"] }}
                             </td>
                             <td data-price="{{ item["price_no_vat"] * item["quantity"] }}">
@@ -154,8 +210,11 @@
 
 
                             </td>
-                            <td data-price="{{ ((item["price_no_vat"] | float) * (item["quantity"] | float)) + ((item['price_no_vat'] | float) * (item['quantity'] | float) * (item['vat_percentage'] | float) * 0.01) }}">
-                                asd
+                            <td data-price="{{ ((item["price_no_vat"] | float) * (item["quantity"] | float)) + ((item['price_no_vat'] | float) * (item['quantity'] | float) * (item['vat_percentage'] | float) * 0.01) }} ">
+
+                            </td>
+                            <td data-raw-discount="{{ item["discount_percentage"] }}" data-raw-discount-amount="{{ (1 - (item["discount_percentage"] | float) * 0.01) * (((item["price_no_vat"] | float) * (item["quantity"] | float)) + ((item['price_no_vat'] | float) * (item['quantity'] | float) * (item['vat_percentage'] | float) * 0.01)) }}">
+                                {{ item["discount_percentage"] }}%
                             </td>
                             <td>
                                 <button type="button" class="btn btn-light" onclick="removeProduct(this)">
@@ -170,10 +229,12 @@
                             <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
                             <td id="total-price">0,00</td>
                             <td id="total-vat">0,00</td>
-                            <td colspan="2" id="total-with-vat">0,00</td>
+                            <td id="total-with-vat">0,00</td>
+                            <td colspan="2" id="total-with-vat-and-discount">0,00</td>
+
                         </tr>
                         <tr class="customer-product-instance">
-                            <td colspan="9" style="text-align: center;">
+                            <td colspan="10" style="text-align: center;">
                                 <button type="button" id="open-popup" class="btn btn-outline-light">Add product</button>
                             </td>
                         </tr>
@@ -189,7 +250,222 @@
     </div>
 
     <script>
-        window.onload = updateTotal;
+
+        let productList = [];
+
+        const popup = document.getElementById('popup')
+        const openPopupBtn = document.getElementById('open-popup')
+        const closePopupBtn = document.getElementById('close-popup')
+        const addBtn = document.getElementById('add')
+
+        openPopupBtn.addEventListener('click', () => {
+            popup.style.display = 'block'
+        })
+
+        closePopupBtn.addEventListener('click', () => {
+            document.getElementById('product-dropdown').value = 'default';
+            document.getElementById('product-id').value = '';
+            document.getElementById('product-name').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('discount').value = 0;
+            document.getElementById('description').value = '';
+            popup.style.display = 'none'
+        })
+
+        addBtn.addEventListener('click', () => {
+            popup.style.display = 'none'
+        })
+
+        document.getElementById('invoice-form').addEventListener('submit', function (event){
+            event.preventDefault();
+            submitInvoice();
+        })
+
+        async function submitInvoice(){
+            const invoice_number = document.getElementById('invoice-number').value;
+            const invoice_date_time = document.getElementById('invoice-date-time').value;
+            const invoice_customer = document.getElementById('customer-id').value;
+            const vat_status = document.getElementById('invoice-with-vat').checked;
+            const invoice_note = document.getElementById('invoice-note').value;
+
+            const rows = document.querySelectorAll("#product-table tbody tr");
+            rows.forEach(row => {
+                const productId = row.querySelector("td[data-raw-id]").dataset.rawId;
+                const productDiscount = row.querySelector("td[data-raw-discount]").dataset.rawDiscount;
+                const productDescription = row.querySelector("td[data-raw-description]").dataset.rawDescription;
+                const productPriceNoVat = row.querySelector("td[data-raw-price]").dataset.rawPrice;
+                const productQuantity = row.querySelector("td[data-raw-quantity]").dataset.rawQuantity;
+                const productVatPercentage = row.querySelector("td[data-raw-vat-percentage]").dataset.rawVatPercentage;
+
+                productList.push({
+                    id: Number(productId),
+                    quantity: Number(productQuantity),
+                    price: Number(productPriceNoVat),
+                    discount: Number(productDiscount),
+                    description: productDescription,
+                    vatPercentage: Number(productVatPercentage)
+                })
+            })
+
+            if(productList.length === 0){
+                alert("No product added!");
+                return;
+            }
+
+            if(!invoice_date_time || !invoice_customer){
+                alert('Fill out the form please.');
+                return;
+            }
+
+            const invoiceData = {
+                invoiceNumber: invoice_number,
+                invoiceDateTime: invoice_date_time,
+                customer: invoice_customer,
+                vatStatus: vat_status,
+                invoiceNote: invoice_note,
+                productList: productList
+            }
+
+             try {
+                const res = await fetch('/mInvoices/invoices/invoice?id={{ invoice_id }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(invoiceData)
+                });
+                if(res.ok){
+                    window.location = '/mInvoices/invoices';
+                    alert("Invoice updated.")
+
+                }else{
+                    alert("Error updating invoice.")
+                }
+            }catch (err){
+                alert(err);
+            }
+        }
+
+         async function fetchProducts(){
+            const dropdown = document.getElementById('product-dropdown')
+            if (dropdown.options.length > 1){
+                return;
+            }
+            try {
+                const res = await fetch('/api/fetch-products')
+                const products = await res.json();
+
+                const productMap = {}
+                products.forEach(e => {
+                    productMap[e.id] = e;
+                    const option = document.createElement('option');
+                    option.value = e.id
+                    option.textContent = e.name
+                    dropdown.appendChild(option)
+                });
+                dropdown.addEventListener('change', e => optionSelection(e, productMap))
+            }catch (err){
+                console.log('Error fetching products', err)
+            }
+        }
+
+        function optionSelection(event, productMap) {
+            const selectedOptionId = event.target.value;
+
+            if (selectedOptionId !== 'default') {
+                const selectedOption = productMap[selectedOptionId];
+                document.getElementById('product-id').value = selectedOption.id;
+                document.getElementById('product-name').value = selectedOption.name
+                document.getElementById('price').value = selectedOption.price;
+                document.getElementById('description').value = selectedOption.description;
+                document.getElementById('vat-percentage').value = selectedOption.vat_percentage;
+                document.getElementById('vat-status').checked = selectedOption.vat_status !== 0;
+
+
+            } else {
+                document.getElementById('product-id').value = '';
+                document.getElementById('product-name').value = '';
+                document.getElementById('price').value = '';
+                document.getElementById('description').value = '';
+                document.getElementById('vat-percentage').value = 0;
+                document.getElementById('vat-status').checked = false;
+            }
+        }
+
+        function addProduct(){
+
+            const productId = document.getElementById('product-id').value;
+            const productName = document.getElementById('product-name').value;
+            const productAmount = document.getElementById('amount').value;
+            const baseProductPrice = document.getElementById('price').value;
+            const productDiscount = document.getElementById('discount').value;
+            const productDescription = document.getElementById('description').value;
+            const productVat = document.getElementById('vat-percentage').value;
+            const productVatStatus = document.getElementById('vat-status').checked;
+            if(!productId || !productName || !productAmount || !baseProductPrice || !productDiscount){
+                alert('Please fill in all the fields!')
+                return
+            }
+
+            let productPrice = baseProductPrice;
+            if(productVatStatus === true){
+                productPrice = (productPrice/(1+(productVat*0.01)));
+            }
+            const total = productPrice * productAmount;
+
+            const tableBody = document.getElementById('product-table').querySelector('tbody');
+            const row = document.createElement('tr');
+            const vatTotal = total * productVat * 0.01;
+                const totalWithVat = vatTotal + total;
+                row.innerHTML = `
+                <td style="display:none"  data-raw-id="${productId}">
+
+                </td>
+                <td>
+                    ${productName}
+                </td>
+                <td data-raw-description="${productDescription}">
+                    ${productDescription}
+                </td>
+                <td data-raw-price="${productPrice}">
+                    ${formatNumbers(productPrice)}
+                </td>
+                <td data-raw-quantity="${productAmount}">
+                    ${productAmount}
+                </td>
+                <td data-raw-vat-percentage=" ${productVat}">
+                    ${productVat}
+                </td>
+                <td>
+                    ${formatNumbers(total)}
+                </td>
+                <td>
+                    ${formatNumbers(vatTotal)}
+                </td>
+                <td>
+                    ${formatNumbers(totalWithVat)}
+                </td>
+                <td data-raw-discount-amount="${(1 - productDiscount * 0.01) * totalWithVat}" data-raw-discount=" ${productDiscount}">
+                    ${productDiscount}%
+                </td>
+                <td>
+                    <button type="button" class="btn btn-light" onclick="removeProduct(this)">
+                        <img src="/static/icons/trash.svg">
+                    </button>
+                </td>
+            `
+            tableBody.prepend(row);
+            updateTotal();
+        }
+
+    </script>
+
+    <script>
+        window.onload = function(){
+            updateTotal();
+        };
+
+
         function formatNumbers(n){
                 return new Intl.NumberFormat('de-DE', {
                 minimumFractionDigits: 2,
@@ -201,26 +477,35 @@
             cell.textContent = `${formatNumbers(rawValue)}`;
         });
 
+        function removeProduct(button){
+            const row = button.parentElement.parentElement;
+            row.remove();
+            updateTotal();
+        }
+
          function updateTotal(){
-            const tableBody = document.getElementById('product-table').querySelector('tbody')
+            const rows = document.querySelectorAll("#product-table tbody tr");
             let totalPrice = 0;
             let totalVat = 0;
             let totalWithVat = 0;
+            let totalWithVatAndDiscount = 0;
 
-            Array.from(tableBody.rows).forEach(r => {
-                let price = parseFloat(r.cells[5]?.textContent.replace('.', '').replace(',', '.')) || 0;
-                let vat = parseFloat(r.cells[6]?.textContent.replace('.', '').replace(',', '.')) || 0;
-                let totalWVat = parseFloat(r.cells[7]?.textContent.replace('.', '').replace(',', '.')) || 0;
-
+            rows.forEach(r => {
+                let price = parseFloat(r.cells[6]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let vat = parseFloat(r.cells[7]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let totalWVat = parseFloat(r.cells[8]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let totalWVatAndDisc = parseFloat(r.querySelector("td[data-raw-discount-amount]").dataset.rawDiscountAmount || 0);
 
                 totalPrice += price || 0;
                 totalVat += vat || 0;
                 totalWithVat += totalWVat || 0;
+                totalWithVatAndDiscount += totalWVatAndDisc || 0;
             })
 
             document.getElementById('total-price').textContent = formatNumbers(totalPrice);
             document.getElementById('total-vat').textContent = formatNumbers(totalVat);
             document.getElementById('total-with-vat').textContent = formatNumbers(totalWithVat);
+            document.getElementById('total-with-vat-and-discount').textContent = formatNumbers(totalWithVatAndDiscount);
 
         }
 
@@ -241,19 +526,18 @@
 
         optionsList.forEach(function(element){
             element.addEventListener("click", function (){
-                text = this.textContent
-                soValue.value = text
+                soValue.value = this.textContent
                 searchSelectBox.classList.remove('active')
                 hiddenInput.value = this.getAttribute('data-id')
             })
         })
 
         optionSearch.addEventListener('keyup', function (){
-            var filter, li, i, textValue
+            let filter, li, i, textValue;
             filter = optionSearch.value.toUpperCase()
             li = options.getElementsByTagName('li')
             for(i = 0; i < li.length; i++){
-                e = li[i]
+                let e = li[i]
                 textValue = e.textContent || e.innerText
                 if(textValue.toUpperCase().indexOf(filter) > -1){
                     li[i].style.display = ''

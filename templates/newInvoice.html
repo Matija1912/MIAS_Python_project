@@ -126,23 +126,23 @@
                             <th>Total</th>
                             <th>VAT total</th>
                             <th>Total with VAT</th>
+                            <th>Discount</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody class="customer_product_data_columns">
-                        <tr class="customer-product-instance">
 
-                        </tr>
                     </tbody>
                     <tfoot class="customer_product_data_columns">
                         <tr id="total-row">
                             <td colspan="5" style="text-align: right;"><strong>Total:</strong></td>
                             <td id="total-price">0,00</td>
                             <td id="total-vat">0,00</td>
-                            <td colspan="2" id="total-with-vat">0,00</td>
+                            <td id="total-with-vat">0,00</td>
+                            <td colspan="2" id="total-with-vat-and-discount">0,00</td>
                         </tr>
                         <tr class="customer-product-instance">
-                            <td colspan="9" style="text-align: center;">
+                            <td colspan="10" style="text-align: center;">
                                 <button type="button" id="open-popup" class="btn btn-outline-light">Add product</button>
                             </td>
                         </tr>
@@ -172,23 +172,22 @@
 
         optionsList.forEach(function(element){
             element.addEventListener("click", function (){
-                text = this.textContent
-                soValue.value = text
+                soValue.value = this.textContent
                 searchSelectBox.classList.remove('active')
                 hiddenInput.value = this.getAttribute('data-id')
             })
         })
 
         optionSearch.addEventListener('keyup', function (){
-            var filter, li, i, textValue
+            let filter, li, i, textValue;
             filter = optionSearch.value.toUpperCase()
             li = options.getElementsByTagName('li')
-            for(i = 0; i < li.length; i++){
-                e = li[i]
+            for (i = 0; i < li.length; i++) {
+                let e = li[i]
                 textValue = e.textContent || e.innerText
-                if(textValue.toUpperCase().indexOf(filter) > -1){
+                if (textValue.toUpperCase().indexOf(filter) > -1) {
                     li[i].style.display = ''
-                }else{
+                } else {
                     li[i].style.display = 'none'
                 }
             }
@@ -225,7 +224,7 @@
 
     <script>
 
-        const productList = [];
+        let productList = [];
 
         document.getElementById('invoice-form').addEventListener('submit', function (event){
             event.preventDefault();
@@ -238,6 +237,25 @@
             const invoice_customer = document.getElementById('customer-id').value;
             const vat_status = document.getElementById('invoice-with-vat').checked;
             const invoice_note = document.getElementById('invoice-note').value;
+
+            const rows = document.querySelectorAll("#product-table tbody tr");
+            rows.forEach(row => {
+                const productId = row.querySelector("td[data-raw-id]").dataset.rawId;
+                const productDiscount = row.querySelector("td[data-raw-discount]").dataset.rawDiscount;
+                const productDescription = row.querySelector("td[data-raw-description]").dataset.rawDescription;
+                const productPriceNoVat = row.querySelector("td[data-raw-price]").dataset.rawPrice;
+                const productQuantity = row.querySelector("td[data-raw-quantity]").dataset.rawQuantity;
+                const productVatPercentage = row.querySelector("td[data-raw-vat-percentage]").dataset.rawVatPercentage;
+
+                productList.push({
+                    id: Number(productId),
+                    quantity: Number(productQuantity),
+                    price: Number(productPriceNoVat),
+                    discount: Number(productDiscount),
+                    description: productDescription,
+                    vatPercentage: Number(productVatPercentage)
+                })
+            })
 
             if(productList.length === 0){
                 alert("No product added!");
@@ -269,8 +287,7 @@
                 if(res.ok){
                     window.location = '/mInvoices/invoices';
                 }else{
-                    const err = await res.json();
-                    alert(err.error)
+                    alert("Error creating a new invoice.")
                 }
             }catch (err){
                 alert(err);
@@ -286,7 +303,7 @@
             }
             try {
                 const res = await fetch('/api/fetch-products')
-                products = await res.json();
+                const products = await res.json();
 
                 const productMap = {}
                 products.forEach(e => {
@@ -325,7 +342,6 @@
             }
         }
 
-        //product list
         function addProduct(){
             const productId = document.getElementById('product-id').value;
             const productName = document.getElementById('product-name').value;
@@ -350,20 +366,24 @@
             const row = document.createElement('tr');
             const vatTotal = total * productVat * 0.01;
                 const totalWithVat = vatTotal + total;
+                row.className = "customer-product-instance";
                 row.innerHTML = `
+                <td style="display:none"  data-raw-id="${productId}">
+
+                </td>
                 <td>
                     ${productName}
                 </td>
-                <td>
+                <td data-raw-description="${productDescription}">
                     ${productDescription}
                 </td>
-                <td>
+                <td data-raw-price="${productPrice}">
                     ${formatNumbers(productPrice)}
                 </td>
-                <td>
+                <td data-raw-quantity="${productAmount}">
                     ${productAmount}
                 </td>
-                <td>
+                <td data-raw-vat-percentage=" ${productVat}">
                     ${productVat}
                 </td>
                 <td>
@@ -375,6 +395,9 @@
                 <td>
                     ${formatNumbers(totalWithVat)}
                 </td>
+                <td data-raw-discount="${productDiscount}" data-raw-discount-amount="${(1- (productDiscount * 0.01)) * totalWithVat}">
+                    ${productDiscount}%
+                </td>
                 <td>
                     <button type="button" class="btn btn-light" onclick="removeProduct(this)">
                         <img src="/static/icons/trash.svg">
@@ -382,16 +405,6 @@
                 </td>
             `
             tableBody.prepend(row);
-
-
-            productList.push({
-                id: Number(productId),
-                quantity: Number(productAmount),
-                price: Number(productPrice),
-                discount: Number(productDiscount),
-                description: productDescription,
-                vatPercentage: Number(productVat)
-            })
 
             updateTotal();
         }
@@ -403,25 +416,28 @@
         }
 
         function updateTotal(){
-            const tableBody = document.getElementById('product-table').querySelector('tbody')
+            const rows = document.querySelectorAll("#product-table tbody tr");
             let totalPrice = 0;
             let totalVat = 0;
             let totalWithVat = 0;
+            let totalWithVatAndDiscount = 0;
 
-            Array.from(tableBody.rows).forEach(r => {
-                let price = parseFloat(r.cells[5]?.textContent.replace('.', '').replace(',', '.')) || 0;
-                let vat = parseFloat(r.cells[6]?.textContent.replace('.', '').replace(',', '.')) || 0;
-                let totalWVat = parseFloat(r.cells[7]?.textContent.replace('.', '').replace(',', '.')) || 0;
-
+            rows.forEach(r => {
+                let price = parseFloat(r.cells[6]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let vat = parseFloat(r.cells[7]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let totalWVat = parseFloat(r.cells[8]?.textContent.replace('.', '').replace(',', '.')) || 0;
+                let totalWVatAndDisc = parseFloat(r.querySelector("td[data-raw-discount-amount]").dataset.rawDiscountAmount || 0);
 
                 totalPrice += price || 0;
                 totalVat += vat || 0;
                 totalWithVat += totalWVat || 0;
+                totalWithVatAndDiscount += totalWVatAndDisc || 0;
             })
 
             document.getElementById('total-price').textContent = formatNumbers(totalPrice);
             document.getElementById('total-vat').textContent = formatNumbers(totalVat);
             document.getElementById('total-with-vat').textContent = formatNumbers(totalWithVat);
+            document.getElementById('total-with-vat-and-discount').textContent = formatNumbers(totalWithVatAndDiscount);
 
         }
 

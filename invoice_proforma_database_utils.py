@@ -40,6 +40,7 @@ def get_invoice_by_id(invoice_id, company_id):
                     "price_no_vat": e[6],
                     "quantity": e[4],
                     "vat_percentage": e[8],
+                    "discount_percentage": e[5]
                 })
 
         if invoice_result:
@@ -127,7 +128,7 @@ def create_new_invoice(company_id, invoice, _year, invoice_products):
                 })
 
                 last_insert_id = connection.execute(query_last_inserted_invoice, {
-                    "invoice_number": next_invoice_number[0],
+                    "invoice_number": invoice.invoice_number,
                     "invoice_year": _year,
                     "company_id": company_id
                 }).fetchone()[0]
@@ -175,8 +176,6 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
     try:
         with get_db_connection() as connection:
             with connection.begin():
-                print(company_id)
-                print(_year)
                 connection.execute(update_counter_query, {
                     "_company_id": company_id,
                     "_year": _year,
@@ -203,7 +202,6 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
                     "invoice_year": _year,
                     "company_id": company_id
                 }).fetchone()[0]
-                print(last_insert_id)
 
                 for item in invoice_products:
                     connection.execute(query_items, {
@@ -236,3 +234,52 @@ def remove_selected_invoice(invoice_id, company_id):
                 flash('Invoice removed', category="success")
     except Exception as e:
         flash('An error has occurred while removing an invoice. Please try again or contact MIAS.', category='error')
+
+def update_selected_invoice(invoice_id, company_id, invoice_items):
+    remove_invoice_items = text("""
+        DELETE ii 
+        FROM invoice_items ii
+        JOIN invoices i ON i.id = ii.invoice_id 
+        WHERE ii.invoice_id = :invoice_id
+        AND i.company_id = :company_id
+    """)
+    insert_new_invoice_items = text("""
+        INSERT INTO invoice_items
+        (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage)
+        VALUES 
+        (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage)
+    """)
+    validation_query = text("""
+        SELECT company_id
+        FROM invoices
+        WHERE id = :invoice_id
+    """)
+
+    try:
+        with get_db_connection() as connection:
+            with connection.begin():
+                res = connection.execute(validation_query, {
+                    "invoice_id": invoice_id
+                }).fetchone()
+                if not res or res[0] != company_id:
+                    raise ValueError("Unauthorized acces to invoice.")
+
+                connection.execute(remove_invoice_items, {
+                    "invoice_id": invoice_id,
+                    "company_id": company_id
+                })
+
+                for item in invoice_items:
+                    connection.execute(insert_new_invoice_items, {
+                        "invoice_id": invoice_id,
+                        "product_id": item.get('id'),
+                        "quantity": item.get('quantity'),
+                        "discount": item.get('discount'),
+                        "product_price_no_vat": item.get('price'),
+                        "product_description": item.get('description'),
+                        "vat_percentage": item.get('vatPercentage')
+                    })
+                return jsonify({'message': "Invoice updated!"}), 201
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify({'error': "Error updating invoice."}), 400

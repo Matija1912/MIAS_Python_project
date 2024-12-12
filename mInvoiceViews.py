@@ -151,8 +151,17 @@ def invoice():
     res = get_invoice_by_id(invoice_id, current_user.company.id)
     if res:
         if request.method == "POST":
-            pass
+            if request.is_json:
+                data = request.get_json()
+                invoice_number = data.get('invoiceNumber')
+                invoice_date_time = datetime.strptime(data.get('invoiceDateTime'), '%Y-%m-%dT%H:%M')
+                customer_id = data.get('customer')
+                invoice_note = data.get('invoiceNote')
+                invoice_with_vat = data.get('vatStatus')
+                invoice_products = data.get('productList')
+                update_selected_invoice(invoice_id, current_user.company.id, invoice_products)
 
+        invoice_id = res['invoice'][0]
         customer_id = int(res['invoice'][1])
         invoice_with_vat = bool(res['invoice'][2])
         status = res['invoice'][3]
@@ -172,7 +181,7 @@ def invoice():
 
         selected_invoice = Invoice(customer_id, invoice_number, invoice_device_number, invoice_office_number, created_at, status, invoice_with_vat, note)
 
-        return render_template('invoice.html', user=current_user,invoice_customer_id=invoice_customer_id, invoice_customer_name=invoice_customer_name, customers=_customers, invoice=selected_invoice, year=year, date=date, time=time, invoice_items=invoice_items)
+        return render_template('invoice.html',invoice_id=invoice_id, user=current_user,invoice_customer_id=invoice_customer_id, invoice_customer_name=invoice_customer_name, customers=_customers, invoice=selected_invoice, year=year, date=date, time=time, invoice_items=invoice_items)
     else:
         return redirect(url_for('mInvoicesViews.invoices'))
 @mInvoicesViews.route('/invoices', methods=['GET', 'POST'])
