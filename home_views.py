@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 
-views = Blueprint('views', __name__)
+home_views = Blueprint('home_views', __name__)
 
 @views.route('/', methods=['GET'])
 def home_page():
@@ -16,3 +16,5 @@ def mInvoices():
 @login_required
 def mStock():
     return render_template('mStock.html', title='mStock', user=current_user)
+
+# @views.route('/download')

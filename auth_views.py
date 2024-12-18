@@ -19,7 +19,7 @@ def login():
                 login_user(user)
                 session['_user_id'] = user.id
                 flash('Logged in successfully!', category='success')
-                return redirect(url_for('views.home_page'))
+                return redirect(url_for('home_views.home_page'))
             else:
                 flash('Incorrect password', category='error')
         else:
