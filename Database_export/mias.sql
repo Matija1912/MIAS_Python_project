@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2024 at 09:07 PM
+-- Generation Time: Dec 18, 2024 at 11:41 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -97,16 +97,17 @@ CREATE TABLE `companies` (
   `street` varchar(255) DEFAULT NULL,
   `city` varchar(255) DEFAULT NULL,
   `post_number` varchar(255) DEFAULT NULL,
-  `vat_id` varchar(255) DEFAULT NULL
+  `vat_id` varchar(255) DEFAULT NULL,
+  `iban` varchar(34) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `companies`
 --
 
-INSERT INTO `companies` (`id`, `company_name`, `street`, `city`, `post_number`, `vat_id`) VALUES
-(1, 'Motorsport innovations and solutions d.o.o.', 'Glavna cesta 84', 'Đurđekovec', '10362', 'HR92531046076'),
-(2, 'MOTORSPORT INNOVATIONS AND SOLUTIONS d.o.o.', 'Glavna cesta 84', 'Durdekovec', '10362', 'HR92531046076');
+INSERT INTO `companies` (`id`, `company_name`, `street`, `city`, `post_number`, `vat_id`, `iban`) VALUES
+(1, 'Motorsport innovations and solutions d.o.o.', 'Glavna cesta 84', 'Đurđekovec', '10362', 'HR92531046076', 'HR0924840081135381404'),
+(2, 'MOTORSPORT INNOVATIONS AND SOLUTIONS d.o.o.', 'Glavna cesta 84', 'Durdekovec', '10362', 'HR92531046076', 'HR0924840081135381404');
 
 -- --------------------------------------------------------
 
@@ -164,7 +165,11 @@ CREATE TABLE `invoices` (
 --
 
 INSERT INTO `invoices` (`id`, `customer_id`, `invoice_with_vat`, `status`, `created_at`, `invoice_number`, `company_id`, `invoice_office_number`, `invoice_device_number`, `note`) VALUES
-(38, 7, 1, 'Pending', '2024-12-10 19:23:00', 1, 2, 1, 1, '1. Dokument izradio: Domagoj Lepen\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    ');
+(57, 1, 1, 'Pending', '2024-12-14 14:19:00', 1, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    \n                    \n                    '),
+(58, 6, 1, 'Pending', '2024-12-14 14:23:00', 2, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(59, 6, 1, 'Pending', '2024-12-14 14:28:00', 3, NULL, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(60, 1, 1, 'Pending', '2024-12-14 16:30:00', 3, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    '),
+(61, 2, 1, 'Pending', '2024-12-14 18:22:00', 4, 1, 1, 1, '1. Dokument izradio: Karlo Kovacic\n2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.\n                    \n                    ');
 
 -- --------------------------------------------------------
 
@@ -175,7 +180,7 @@ INSERT INTO `invoices` (`id`, `customer_id`, `invoice_with_vat`, `status`, `crea
 CREATE TABLE `invoice_counter` (
   `year` int(4) NOT NULL,
   `next_invoice_number` int(11) NOT NULL DEFAULT 0,
-  `company_id` int(11) DEFAULT NULL
+  `company_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -183,7 +188,7 @@ CREATE TABLE `invoice_counter` (
 --
 
 INSERT INTO `invoice_counter` (`year`, `next_invoice_number`, `company_id`) VALUES
-(2024, 1, 2);
+(2024, 4, 1);
 
 -- --------------------------------------------------------
 
@@ -199,15 +204,23 @@ CREATE TABLE `invoice_items` (
   `discount` decimal(10,2) DEFAULT 0.00,
   `product_price_no_vat` decimal(10,2) DEFAULT NULL,
   `product_description` text DEFAULT NULL,
-  `vat_percentage` decimal(5,2) DEFAULT 0.00
+  `vat_percentage` decimal(5,2) DEFAULT 0.00,
+  `product_name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `invoice_items`
 --
 
-INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `discount`, `product_price_no_vat`, `product_description`, `vat_percentage`) VALUES
-(21, 38, 12, 1, 0.00, 1195.95, 'Product1 description', 25.00);
+INSERT INTO `invoice_items` (`id`, `invoice_id`, `product_id`, `quantity`, `discount`, `product_price_no_vat`, `product_description`, `vat_percentage`, `product_name`) VALUES
+(197, 57, 7, 1, 0.00, 1200.00, 'Kayo TT140 pit bike.\nVIN: ', 25.00, 'KAYO TT140'),
+(198, 58, 9, 1, 20.00, 1840.00, 'Kayo K2 Enduro motocikl.\nVIN: ADGQEQE762', 25.00, 'KAYO K2 ENDURO'),
+(199, 58, 5, 1, 20.00, 1000.00, 'Kayo TS90 pit bike.\nVIN: ASFQGHQ123T', 25.00, 'KAYO TS90'),
+(200, 58, 7, 1, 20.00, 1200.00, 'Kayo TT140 pit bike.\nVIN: QWF12RFWQ', 25.00, 'KAYO TT140'),
+(201, 59, 5, 1, 20.00, 800.00, 'Kayo TS90 pit bike.\nVIN:SDASDDAS121', 25.00, 'KAYO TS90'),
+(202, 59, 7, 1, 20.00, 1200.00, 'Kayo TT140 pit bike.\nVIN: Sdasdas12312', 25.00, 'KAYO TT140'),
+(203, 60, 9, 1, 0.00, 1840.00, 'Kayo K2 Enduro motocikl.\nVIN: ', 25.00, 'KAYO K2 ENDURO'),
+(205, 61, 5, 1, 0.00, 1000.00, 'Kayo TS90 pit bike.\nVIN:', 25.00, 'KAYO TS90');
 
 -- --------------------------------------------------------
 
@@ -231,12 +244,13 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `price`, `vat_percentage`, `stock`, `company_id`, `vat_status`) VALUES
-(5, 'KAYO TS90', 'Kayo TS90 pit bike.\r\nVIN:', 1000.00, 25.00, 0, 1, 0),
-(7, 'KAYO TT140', 'Kayo TT140 pit bike.\r\nVIN: ', 1200.00, 25.00, 0, 1, 0),
-(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 0, 1, 0),
+(5, 'KAYO TS90', 'Kayo TS90 pit bike.\r\nVIN:', 1000.00, 25.00, 3, 1, 0),
+(7, 'KAYO TT140', 'Kayo TT140 pit bike.\r\nVIN: ', 1200.00, 25.00, 4, 1, 0),
+(9, 'KAYO K2 ENDURO', 'Kayo K2 Enduro motocikl.\r\nVIN: ', 1840.00, 25.00, 1, 1, 0),
 (12, 'Product1', 'Product1 description', 1195.95, 25.00, 0, 2, 0),
-(13, 'KAYO K6', 'Kayo K6 motocikl.\r\nVIN: ', 4600.00, 25.00, 0, 1, 0),
-(14, 'Dostava', 'Usluga dostave', 100.00, 25.00, 0, 1, 1);
+(13, 'KAYO K6', 'Kayo K6 motocikl.\r\nVIN: ', 4600.00, 25.00, 5, 1, 0),
+(14, 'Dostava', 'Usluga dostave', 100.00, 25.00, 0, 1, 1),
+(15, 'KAYO A150', 'Kayo A150\r\nVIN: ', 2000.00, 25.00, 10, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -296,7 +310,7 @@ ALTER TABLE `invoices`
 -- Indexes for table `invoice_counter`
 --
 ALTER TABLE `invoice_counter`
-  ADD PRIMARY KEY (`year`),
+  ADD PRIMARY KEY (`year`,`company_id`),
   ADD KEY `fk_cinvoice_counter_company_id` (`company_id`);
 
 --
@@ -342,19 +356,19 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `invoices`
 --
 ALTER TABLE `invoices`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT for table `invoice_items`
 --
 ALTER TABLE `invoice_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=206;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
