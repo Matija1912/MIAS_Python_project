@@ -31,6 +31,16 @@
     border: 1px solid #2145a6;
 }
 
+td > a{
+    border: 1px solid white;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+td > a:hover{
+    background-color: white;
+}
+
 .customer-product-instance{
     cursor: pointer;
 }

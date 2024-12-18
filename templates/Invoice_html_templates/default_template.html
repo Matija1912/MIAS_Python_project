@@ -69,11 +69,11 @@
         <div class="content">
             <div class="header">
                 <h1>{{ user.company.name }}</h1>
-                <p>{{ user.company.street }}, {{ user.company.post_number }} {{ user.company.city }}, Hrvatska<br>OIB: {{ user.company.vat_id }}<br>Email: {{ user.email }}</p>
+                <p>{{ user.company.street }}, {{ user.company.post_number }} {{ user.company.city }}, {{ user.company.country }}<br>OIB: {{ user.company.vat_id }}<br>Email: {{ user.email }}</p>
             </div>
 
             <div class="invoice-title">
-                <h2>Račun br. 2/01/01</h2>
+                <h2>Račun br. {{ invoice.invoice_number }}/{{ invoice.invoice_office_number }}/{{ invoice.invoice_device_number }}</h2>
             </div>
 
             <div class="details">
@@ -81,18 +81,18 @@
                     <tr>
                         <td>
                             <strong>Customer:</strong><br>
-                            MARIO - obrt za prijevoz i usluge<br>
-                            ALEJA MIRA 3<br>
-                            10360 SESVETE<br>
-                            HRVATSKA<br>
-                            OIB: 33514956214
+                            {{ customer.name }}<br>
+                            {{ customer.street }}<br>
+                            {{ customer.post_number }} {{ customer.city }}<br>
+                            {{ customer.country }}<br>
+                            OIB: {{ customer.vat_id }}
                         </td>
                         <td>
-                            <strong>Datum izdavanja:</strong> 09.10.2024 11:42<br>
+                            <strong>Datum izdavanja:</strong> {{ invoice.created_at.strftime('%d.%m.%Y') }}<br>
                             <strong>Rok plaćanja:</strong> 31.10.2024<br>
                             <strong>Način plaćanja:</strong> Transakcijski račun<br>
-                            <strong>Mjesto izdavanja:</strong> Đurđekovec<br>
-                            <strong>Model / Poziv na broj:</strong> HR00 20101<br>
+                            <strong>Mjesto izdavanja:</strong> {{ user.company.city }}<br>
+                            <strong>Model / Poziv na broj:</strong> HR00 {{ '{:02d}'.format(invoice.invoice_number) }}{{ '{:02d}'.format(invoice.invoice_office_number) }}{{ '{:02d}'.format(invoice.invoice_device_number) }}<br>
                             <strong>Datum isporuke:</strong> 09.10.2024
                         </td>
                     </tr>
@@ -108,32 +108,39 @@
                     <th>Jed. cijena</th>
                     <th>Količina</th>
                     <th>Ukupna cijena</th>
+                    <th>Porez</th>
                 </tr>
-                <tr>
-                    <td>1.</td>
-                    <td>Oslikavanje kamiona</td>
-                    <td>150,00 EUR</td>
-                    <td>0,00 %</td>
-                    <td>150,00 EUR</td>
-                    <td>1,00</td>
-                    <td>150,00 EUR</td>
-                </tr>
+
+                {% for item in invoice_items %}
+
+                    <tr>
+                        <td>{{ loop.index }}.</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ (item.price_no_vat) | price_format }}€</td>
+                        <td>{{ item.discount_percentage }}%</td>
+                        <td>{{ ((1 - (item.discount_percentage | float) / 100) * (item.price_no_vat | float)) | price_format }}€</td>
+                        <td>{{ item.quantity | float }}</td>
+                        <td>{{ (((1 - (item.discount_percentage | float) / 100) * (item.price_no_vat | float)) * (item.quantity | float)) | price_format }}€</td>
+                        <td>{{ '%0.2f' % item.vat_percentage | float }}%</td>
+                    </tr>
+
+                {% endfor %}
             </table>
 
             <div class="summary">
-                <p><strong>Porez (25,00%):</strong> 37,50 EUR<br>
-                <strong>Ukupno s porezom:</strong> 187,50 EUR</p>
+                <p><strong>Porez:</strong>{{ vat_total | price_format }}€<br>
+                <strong>Ukupno s porezom:</strong>{{ total_with_vat | price_format }}€</p>
             </div>
 
             <div class="notes">
                 <p><strong>Napomene:</strong><br>
-                1. Dokument izradio: Matija Kovacic<br>
-                2. Ovaj dokument je izdan u elektronskom obliku te je valjan bez potpisa i pečata.</p>
+                    {{ invoice.note }}
+                </p>
             </div>
         </div>
 
         <div class="footer">
-            <p>Motorsport Innovations and Solutions, Glavna cesta 84, Đurđekovec, 10362<br>OIB: 92531040676<br>Email: matija@kayomotorcycles.eu</p>
+            <p>{{ user.company.name }}, {{ user.company.street }}, {{ user.company.city }}, {{ user.company.post_number }}<br>IBAN:{{ user.company.iban }}<br>OIB: {{ user.company.vat_id }}<br>Email: {{ user.email }}</p>
             <p>Stranica 1 / 1</p>
         </div>
     </div>

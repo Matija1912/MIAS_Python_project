@@ -245,6 +245,7 @@
 
             const rows = document.querySelectorAll("#product-table tbody tr");
             rows.forEach(row => {
+                const productName = row.querySelector("td[data-raw-name]").dataset.rawName;
                 const productId = row.querySelector("td[data-raw-id]").dataset.rawId;
                 const productDiscount = row.querySelector("td[data-raw-discount]").dataset.rawDiscount;
                 const productDescription = row.querySelector("td[data-raw-description]").dataset.rawDescription;
@@ -254,6 +255,7 @@
 
                 productList.push({
                     id: Number(productId),
+                    productName: productName,
                     quantity: Number(productQuantity),
                     price: Number(productPriceNoVat),
                     discount: Number(productDiscount),
@@ -285,9 +287,13 @@
                     body: JSON.stringify(invoiceData)
                 });
                 if(res.ok){
+                    const data = await res.json();
                     window.location = '/mInvoices/invoices';
+                    alert(data.message);
+
                 }else{
-                    alert("Error creating a new invoice.")
+                    const err = await res.json();
+                    alert(err.error);
                 }
             }catch (err){
                 alert(err);
@@ -372,7 +378,7 @@
                 <td style="display:none"  data-raw-id="${productId}">
 
                 </td>
-                <td>
+                <td data-raw-name="${productName}">
                     ${productName}
                 </td>
                 <td data-raw-description="${productDescription}">

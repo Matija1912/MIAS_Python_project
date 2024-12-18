@@ -29,8 +29,8 @@ def get_company_product_count(company_id):
 
 def add_new_product_to_db(_product):
     query = text("""INSERT INTO products 
-           (name, description, price, vat_percentage, company_id, vat_status)
-           VALUES (:name, :description, :price, :vat_percentage, :company_id, :vat_status)
+           (name, description, price, vat_percentage, stock, company_id, vat_status)
+           VALUES (:name, :description, :price, :vat_percentage, :stock, :company_id, :vat_status)
            """)
 
     try:
@@ -41,6 +41,7 @@ def add_new_product_to_db(_product):
                     "description": _product.description,
                     "price": _product.price,
                     "vat_percentage": _product.vat_percentage,
+                    "stock": _product.stock,
                     "company_id": current_user.company.id,
                     "vat_status": _product.vat_status
                 })
@@ -57,6 +58,7 @@ def update_product_info(updated_product_info, product_id):
         description = :description,
         price = :price,
         vat_percentage = :vat_percentage,
+        stock = :stock,
         vat_status = :vat_status
         WHERE id = :id 
     """)
@@ -68,6 +70,7 @@ def update_product_info(updated_product_info, product_id):
                     "description": updated_product_info.description,
                     "price": updated_product_info.price,
                     "vat_percentage": updated_product_info.vat_percentage,
+                    "stock": updated_product_info.stock,
                     "vat_status": updated_product_info.vat_status,
                     "id": product_id
                 })

@@ -26,13 +26,14 @@ class User:
         self.is_auth = False
 
 class Company:
-    def __init__(self, _id, name, street, city, post_number, vat_id):
+    def __init__(self, _id, name, street, city, post_number, vat_id, iban):
         self.id = _id
         self.name = name
         self.street = street
         self.city = city
         self.post_number = post_number
         self.vat_id = vat_id
+        self.iban = iban
 
     def __repr__(self):
         return self.name
@@ -50,13 +51,13 @@ class Customer:
         return self.name + " " + self.email + " " + self.address + " " + self.postal_code + " " + self.city + " " + self.country + " " + self.vat_id
 
 class Product:
-    def __init__(self, name, description, price, vat_percentage, vat_status):
+    def __init__(self, name, description, price, vat_percentage, vat_status, stock):
         self.name = name
         self.description = description
         self.price = price
         self.vat_percentage = vat_percentage
         self.vat_status = vat_status
-        self.stock = 0
+        self.stock = stock
 
 class Invoice:
     def __init__(self, customer_id, invoice_number, invoice_device_number, invoice_office_number, created_at, status, with_vat, note):

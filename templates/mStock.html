@@ -1,8 +1,96 @@
 {% extends "base.html" %}
-{% block title %} mStock {% endblock %}
+{% block title %} Stock {% endblock %}
+
+{% block custom_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/customers_and_products_page.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/tables.css') }}">
+{% endblock %}
 
 {% block content %}
-    <div class="text-white">
-        <h1>Stock management</h1>
+    <div class="table_container">
+        <div class="title_container">
+            <img class="title_icon" src="/static/icons/product.svg" alt="Invoice icon">
+            <h2>Stock</h2>
+        </div>
+        <div class="add_new_customer_product_div">
+            <a href="/mInvoices/products/newProduct" class="btn btn-outline-light">Add new product</a>
+            <a href="../mInvoices" class="btn btn-outline-light">Back</a>
+        </div>
+        <table class="customers_product_table">
+            <thead class="customers_product_columns">
+                <tr>
+                    <th>Name</th>
+                    <th>Price(no VAT)</th>
+                    <th>Price(with VAT)</th>
+                    <th>VAT</th>
+                    <th>Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody class="customer_product_data_columns">
+                {% for product in products %}
+                    <tr class="customer-product-instance">
+                        <td >{{ product.name }}</td>
+                        {% if product.vat_status == 0 %}
+                            <td>{{ "%.2f" % product.price }}€</td>
+                            <td>{{ "%.2f" % (product.price + (product.price * product.vat_percentage/100)) }}€</td>
+                        {% else %}
+                            <td>{{"%.2f" % (product.price/(1+(product.vat_percentage/100))) }}€</td>
+                            <td>{{"%.2f" % product.price }}€</td>
+                        {% endif %}
+                        <td>{{ product.vat_percentage }}</td>
+                        <td>{{ product.stock }}</td>
+                        <td>
+                            <form class="edit-delete" method="post" onsubmit="return confirm('Are you sure you wish to delete?');">
+                                <button type="button" class="btn btn-light" onclick="window.location='/mInvoices/products/product?id={{ product.id }}';">
+                                    <img src="../static/icons/pen.svg">
+                                </button>
+                                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                                    <button type="submit" class="btn btn-light">
+                                    <img src="../static/icons/trash.svg">
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" class="text-center">No products found.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav class="page_navigation" aria-label="Page navigation">
+            <ul class="pagination">
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.products', page=1) }}" aria-label="First">
+                        &laquo;&laquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page <= 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.products', page=page-1) }}" aria-label="Previous">
+                        &laquo;
+                    </a>
+                </li>
+
+                <li class="page-item">
+                    <form action="{{ url_for('mInvoicesViews.products') }}" method="get" class="d-inline">
+                        <input type="number" name="page" min="1" max="{{ page_count }}" value="{{ page }}" class="page_input form-control d-inline-block w-auto">
+                        <button type="submit" class="page_btn">Go</button>
+                    </form>
+                </li>
+
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.products', page=(page + 1)) }}" aria-label="Next">
+                        &raquo;
+                    </a>
+                </li>
+                <li class="page-item {% if page >= page_count %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('mInvoicesViews.products', page=page_count) }}" aria-label="Last">
+                        &raquo;&raquo;
+                    </a>
+                </li>
+            </ul>
+            <p>Page count: {{ page_count }}</p>
+        </nav>
     </div>
 {% endblock %}

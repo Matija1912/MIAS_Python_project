@@ -40,7 +40,7 @@ def get_invoice_by_id(invoice_id, company_id):
                     "price_no_vat": e[6],
                     "quantity": e[4],
                     "vat_percentage": e[8],
-                    "discount_percentage": e[5]
+                    "discount_percentage": e[5],
                 })
 
         if invoice_result:
@@ -104,8 +104,8 @@ def create_new_invoice(company_id, invoice, _year, invoice_products):
             LIMIT 1
         """)
     query_items = text("""
-            INSERT INTO invoice_items (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage)
-            VALUES (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage)
+            INSERT INTO invoice_items (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage, product_name)
+            VALUES (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage, :product_name)
         """)
     try:
         with get_db_connection() as connection:
@@ -141,7 +141,8 @@ def create_new_invoice(company_id, invoice, _year, invoice_products):
                         "discount": item.get('discount'),
                         "product_price_no_vat": item.get('price'),
                         "product_description": item.get('description'),
-                        "vat_percentage": item.get('vatPercentage')
+                        "vat_percentage": item.get('vatPercentage'),
+                        "product_name": item.get('productName')
                     })
 
                 return jsonify({'message': "Invoice created!"}), 201
@@ -170,8 +171,8 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
         LIMIT 1
     """)
     query_items = text("""
-        INSERT INTO invoice_items (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage)
-        VALUES (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage)
+        INSERT INTO invoice_items (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage, product_name)
+        VALUES (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage, :product_name)
     """)
     try:
         with get_db_connection() as connection:
@@ -211,7 +212,8 @@ def create_new_invoice_auto_gen(company_id, invoice, _year, invoice_products):
                         "discount": item.get('discount'),
                         "product_price_no_vat": item.get('price'),
                         "product_description": item.get('description'),
-                        "vat_percentage": item.get('vatPercentage')
+                        "vat_percentage": item.get('vatPercentage'),
+                        "product_name": item.get('productName')
                     })
 
                 return jsonify({'message': "Invoice created!"}), 201
@@ -235,7 +237,7 @@ def remove_selected_invoice(invoice_id, company_id):
     except Exception as e:
         flash('An error has occurred while removing an invoice. Please try again or contact MIAS.', category='error')
 
-def update_selected_invoice(invoice_id, company_id, invoice_items):
+def update_selected_invoice(invoice_id, company_id, invoice_items, invoice_number, created_at, invoice_with_vat, note, customer_id):
     remove_invoice_items = text("""
         DELETE ii 
         FROM invoice_items ii
@@ -245,14 +247,26 @@ def update_selected_invoice(invoice_id, company_id, invoice_items):
     """)
     insert_new_invoice_items = text("""
         INSERT INTO invoice_items
-        (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage)
+        (invoice_id, product_id, quantity, discount, product_price_no_vat, product_description, vat_percentage, product_name)
         VALUES 
-        (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage)
+        (:invoice_id, :product_id, :quantity, :discount, :product_price_no_vat, :product_description, :vat_percentage, :product_name)
     """)
     validation_query = text("""
         SELECT company_id
         FROM invoices
         WHERE id = :invoice_id
+    """)
+    update_counter_query = text("""CALL UpdateInvoiceCounter(:_company_id, :_year, :_invoice_number)""")
+
+    set_new_invoice_data_query = text("""
+        UPDATE invoices
+        SET invoice_number = :invoice_number,
+            created_at = :created_at,
+            customer_id = :customer_id,
+            invoice_with_vat = :invoice_with_vat,
+            note = :note
+        WHERE id = :invoice_id
+        AND company_id = :company_id
     """)
 
     try:
@@ -277,9 +291,29 @@ def update_selected_invoice(invoice_id, company_id, invoice_items):
                         "discount": item.get('discount'),
                         "product_price_no_vat": item.get('price'),
                         "product_description": item.get('description'),
-                        "vat_percentage": item.get('vatPercentage')
+                        "vat_percentage": item.get('vatPercentage'),
+                        "product_name": item.get('productName')
                     })
+
+                connection.execute(set_new_invoice_data_query, {
+                    "invoice_number": invoice_number,
+                    "invoice_id": invoice_id,
+                    "created_at": created_at,
+                    "customer_id": customer_id,
+                    "invoice_with_vat": invoice_with_vat,
+                    "note": note,
+                    "company_id": company_id
+                })
+
+                connection.execute(update_counter_query, {
+                    "_company_id": company_id,
+                    "_year": created_at.year,
+                    "_invoice_number": invoice_number,
+                })
+
                 return jsonify({'message': "Invoice updated!"}), 201
+    except IntegrityError:
+        return jsonify({'error': "Invoice with that number already exists."}), 400
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return jsonify({'error': "Error updating invoice."}), 400

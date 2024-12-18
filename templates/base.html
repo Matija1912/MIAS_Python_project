@@ -13,72 +13,88 @@
 
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg custom-navbar">
-        <a class="navbar-brand text-white" href="/">
-            <img class="nav-logo" src="/static/logo/MiasLogo_white.png" alt="MiasLogoWhite"/>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/"><span class="nav-item-icon">🏠</span>Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/mInvoices"><span class="nav-item-icon">📄</span>mInvoices</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/mStock"><span class="nav-item-icon">📦</span>mStock</a>
-                </li>
-                {% if user.is_authenticated %}
+    <div class="all-content">
+        <nav class="navbar navbar-expand-lg custom-navbar">
+            <a class="navbar-brand text-white" href="/">
+                <img class="nav-logo" src="/static/logo/MiasLogo_white.png" alt="MiasLogoWhite"/>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/auth/logout"><span class="nav-item-icon">🔑</span>Logout</a>
+                        <a class="nav-link" href="/"><span class="nav-item-icon">🏠</span>Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/auth/registerUser"><span class="nav-item-icon">👤</span>Register user</a>
+                        <a class="nav-link" href="/mInvoices"><span class="nav-item-icon">📄</span>mInvoices</a>
                     </li>
-                {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="/auth/login"><span class="nav-item-icon">🔑</span>Login</a>
+                        <a class="nav-link" href="/mStock"><span class="nav-item-icon">📦</span>mStock</a>
                     </li>
-                {% endif %}
-
-            </ul>
-        </div>
-    </nav>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                {% if category == 'error' %}
-                    <div class="m-4 alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    {% elif category == 'info' %}
-                    <div class="m-4 alert alert-info alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout"><span class="nav-item-icon">🔑</span>Logout</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/registerUser"><span class="nav-item-icon">👤</span>Register user</a>
+                        </li>
                     {% else %}
-                    <div class="m-4 alert alert-success alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="close" data-dismiss="alert">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/login"><span class="nav-item-icon">🔑</span>Login</a>
+                        </li>
+                    {% endif %}
 
-    {% block content %}
-    {% endblock %}
+                </ul>
+            </div>
+        </nav>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    {% if category == 'error' %}
+                        <div class="m-4 alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% elif category == 'info' %}
+                        <div class="m-4 alert alert-info alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% else %}
+                        <div class="m-4 alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
+        {% block content %}
+        {% endblock %}
+    </div>
+        <footer class="footer">
+           <div class="footer-content">
+                <p>&copy; 2024 MOTORSPORT INNOVATIONS AND SOLUTIONS d.o.o. | All rights reserved.
+                </p>
+                <p>
+                    Glavna cesta 84, 10362 Đurđekovec, Croatia / Hrvatska,
+                    <br>
+                    OIB: 92531046076, Matični broj: 05916780,
+                    <br>
+                    IBAN: HR0924840081135381404, Raiffeisen Bank.
+                    <br>
+                    matija@mias.hr, www.mias.hr
+                </p>
+            </div>
+        </footer>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

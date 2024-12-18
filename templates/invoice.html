@@ -48,7 +48,11 @@
 
             <div>
                 <label for="invoice-with-vat">Invoice with VAT</label>
-                <input type="checkbox" id="invoice-with-vat" name="invoice-with-vat" checked>
+                {% if invoice.with_vat %}
+                    <input type="checkbox" id="invoice-with-vat" name="invoice-with-vat" checked>
+                {% else %}
+                    <input type="checkbox" id="invoice-with-vat" name="invoice-with-vat">
+                {% endif %}
             </div>
 
             <div>
@@ -188,7 +192,7 @@
                             <td style="display:none"  data-raw-id="{{ item["product_id"] }}">
 
                             </td>
-                            <td>
+                            <td data-raw-name="{{ item["product_name"] }}">
                                 {{ item["product_name"] }}
                             </td>
                             <td data-raw-description="{{ item["product_description"] }}">
@@ -296,6 +300,7 @@
             const rows = document.querySelectorAll("#product-table tbody tr");
             rows.forEach(row => {
                 const productId = row.querySelector("td[data-raw-id]").dataset.rawId;
+                const productName = row.querySelector("td[data-raw-name]").dataset.rawName;
                 const productDiscount = row.querySelector("td[data-raw-discount]").dataset.rawDiscount;
                 const productDescription = row.querySelector("td[data-raw-description]").dataset.rawDescription;
                 const productPriceNoVat = row.querySelector("td[data-raw-price]").dataset.rawPrice;
@@ -304,6 +309,7 @@
 
                 productList.push({
                     id: Number(productId),
+                    productName: productName,
                     quantity: Number(productQuantity),
                     price: Number(productPriceNoVat),
                     discount: Number(productDiscount),
@@ -335,11 +341,13 @@
                     body: JSON.stringify(invoiceData)
                 });
                 if(res.ok){
+                    const data = await res.json();
                     window.location = '/mInvoices/invoices';
-                    alert("Invoice updated.")
+                    alert(data.message);
 
                 }else{
-                    alert("Error updating invoice.")
+                    const err = await res.json();
+                    alert(err.error);
                 }
             }catch (err){
                 alert(err);
@@ -423,7 +431,7 @@
                 <td style="display:none"  data-raw-id="${productId}">
 
                 </td>
-                <td>
+                <td data-raw-name="${productName}">
                     ${productName}
                 </td>
                 <td data-raw-description="${productDescription}">

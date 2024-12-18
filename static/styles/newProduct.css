@@ -40,6 +40,10 @@
     margin-right: 40px;
 }
 
+.product-stock > input{
+    width: 150px;
+}
+
 .title_container{
     margin-top: 10px;
     color: white;

@@ -74,13 +74,15 @@ def add_new_product():
         price = request.form.get('product-price')
         vat_percentage = request.form.get('product-vat')
         vat_status = bool(request.form.get('vat-status'))
+        product_stock = request.form.get('product-stock')
+
 
         if name and price and vat_percentage:
             try:
                 _price = Decimal(price)
                 _vat = Decimal(vat_percentage)
 
-                new_product = Product(name, description, float(_price), float(_vat), vat_status)
+                new_product = Product(name, description, float(_price), float(_vat), vat_status, product_stock)
                 add_new_product_to_db(new_product)
 
             except InvalidOperation:
@@ -126,15 +128,15 @@ def product():
     if res:
         _price = Decimal(res[3])
         _vat = Decimal(res[4])
-        selected_product = Product(res[1], res[2], _price, _vat, res[7])
+        selected_product = Product(res[1], res[2], _price, _vat, res[7], res[5])
         if request.method == 'POST':
             name = request.form.get('product-name')
             description = request.form.get('product-description')
             price = request.form.get('product-price')
             vat = request.form.get('product-vat')
             vat_status = bool(request.form.get('vat-status'))
-
-            updated_product_info = Product(name, description, price, vat, vat_status)
+            product_stock = request.form.get('product-stock')
+            updated_product_info = Product(name, description, price, vat, vat_status, product_stock)
             update_product_info(updated_product_info, product_id)
 
             return redirect(url_for('mInvoicesViews.products'))
@@ -153,13 +155,20 @@ def invoice():
         if request.method == "POST":
             if request.is_json:
                 data = request.get_json()
-                invoice_number = data.get('invoiceNumber')
+                invoice_number = int(data.get('invoiceNumber'))
                 invoice_date_time = datetime.strptime(data.get('invoiceDateTime'), '%Y-%m-%dT%H:%M')
                 customer_id = data.get('customer')
                 invoice_note = data.get('invoiceNote')
                 invoice_with_vat = data.get('vatStatus')
                 invoice_products = data.get('productList')
-                update_selected_invoice(invoice_id, current_user.company.id, invoice_products)
+                return update_selected_invoice(invoice_id,
+                                               current_user.company.id,
+                                               invoice_products,
+                                               invoice_number,
+                                               invoice_date_time,
+                                               invoice_with_vat,
+                                               invoice_note,
+                                               customer_id)
 
         invoice_id = res['invoice'][0]
         customer_id = int(res['invoice'][1])

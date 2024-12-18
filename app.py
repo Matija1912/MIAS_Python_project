@@ -1,6 +1,6 @@
 from flask import Flask, session, redirect, url_for, flash
 from flask_login import LoginManager, logout_user
-from auth import get_user_by_id
+from auth_views import get_user_by_id
 from models import User
 from models import Company
 from datetime import timedelta, datetime
@@ -8,22 +8,31 @@ from datetime import timedelta, datetime
 app = Flask(__name__)
 
 from api.api import api
-from views import views
-from auth import auth
+from home_views import home_views
+from auth_views import auth
 from mInvoiceViews import mInvoicesViews
+from download_views import download_views
 
 # ONLY IN DEVELOPMENT
 app.config['SECRET_KEY'] = 'mias'
 
 app.register_blueprint(api, url_prefix='/api')
-app.register_blueprint(views, url_prefix='/')
+app.register_blueprint(home_views, url_prefix='/')
 app.register_blueprint(auth, url_prefix='/auth')
 app.register_blueprint(mInvoicesViews, url_prefix='/mInvoices')
+app.register_blueprint(download_views, url_prefix='/download')
 
 login_manager = LoginManager()
 login_manager.login_message_category = "info"
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
+
+@app.template_filter('price_format')
+def price_format(val):
+    try:
+        return f"{float(val):,.2f}"
+    except (ValueError, TypeError):
+        return "0.00"
 
 
 # LOGIC FOR SESSION EXPIRATION
@@ -46,7 +55,7 @@ def function_before_request():
 def load_user(_id):
     res = get_user_by_id(_id)
     if res:
-        company = Company(res[7], res[8], res[9], res[10], res[11], res[12])
+        company = Company(res[7], res[8], res[9], res[10], res[11], res[12], res[13])
         user = User(res[0], res[1], res[3], res[4], company, res[6])
         return user
 
